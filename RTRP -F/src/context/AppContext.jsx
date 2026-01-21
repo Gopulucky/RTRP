@@ -28,62 +28,132 @@ export function AppProvider({ children }) {
         setToast(null);
     }, []);
 
-    // Fetch initial data with timeout and error handling
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            setError(null);
+    const fetchData = useCallback(async (token) => {
+        if (!token) {
+            token = localStorage.getItem('token');
+        }
+        if (!token) {
+            setIsLoading(false);
+            return;
+        }
 
-            // Timeout promise to prevent infinite loading
-            const timeout = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Request timed out')), 10000)
-            );
+        setIsLoading(true);
+        setError(null);
 
-            try {
-                // Fetch each resource independently to avoid one failure blocking everything
-                // We race against the timeout
-                const [skillsRes, userRes, chatsRes] = await Promise.race([
-                    Promise.all([
-                        fetch(`${API_URL}/skills`).catch(err => ({ ok: false, error: err })),
-                        fetch(`${API_URL}/user`).catch(err => ({ ok: false, error: err })),
-                        fetch(`${API_URL}/chats`).catch(err => ({ ok: false, error: err }))
-                    ]),
-                    timeout
-                ]);
+        try {
+            const headers = { 'Authorization': `Bearer ${token}` };
 
-                // Helper to safely parse JSON
-                const parseSafe = async (res) => {
-                    if (res.ok) return await res.json();
-                    console.warn("Fetch failed for resource:", res.url || "unknown");
-                    return null;
-                };
+            const [skillsRes, userRes, chatsRes] = await Promise.all([
+                fetch(`${API_URL}/skills`).catch(err => ({ ok: false, error: err })),
+                fetch(`${API_URL}/user`, { headers }).catch(err => ({ ok: false, error: err })),
+                fetch(`${API_URL}/chats`).catch(err => ({ ok: false, error: err }))
+            ]);
 
-                const skillsData = await parseSafe(skillsRes);
-                const userData = await parseSafe(userRes);
-                const chatsData = await parseSafe(chatsRes);
+            const parseSafe = async (res) => {
+                if (res.ok) return await res.json();
+                return null;
+            };
 
-                // Critical data check
-                if (!userData) {
-                    throw new Error('Failed to load user profile. Is the server running?');
-                }
+            const skillsData = await parseSafe(skillsRes);
+            const userData = await parseSafe(userRes);
+            const chatsData = await parseSafe(chatsRes);
 
-                setSkills(skillsData || []);
+            if (userData) {
                 setCurrentUser(userData);
-                setChats(chatsData || {});
-                setOnlineUsers((skillsData || []).filter(s => s.user.online));
-
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                setError(err.message || "Something went wrong connecting to the server.");
-                showToast("Failed to connect to server", "error");
-            } finally {
-                // Add a small artificial delay to show off the fancy loading screen (optional, remove in prod if desired)
-                setTimeout(() => setIsLoading(false), 800);
+            } else {
+                localStorage.removeItem('token');
+                setCurrentUser(null);
             }
-        };
 
+            setSkills(skillsData || []);
+            setChats(chatsData || {});
+            setOnlineUsers((skillsData || []).filter(s => s.user?.online));
+
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            setError("Failed to load data");
+        } finally {
+            setTimeout(() => setIsLoading(false), 800);
+        }
+    }, [API_URL]);
+
+    const login = async (email, password) => {
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+
+            localStorage.setItem('token', data.token);
+            // We fetch fresh data to ensure everything is synced
+            await fetchData(data.token);
+
+            showToast('Welcome back!', 'success');
+            return true;
+        } catch (err) {
+            showToast(err.message, 'error');
+            return false;
+        }
+    };
+
+    const signup = async (username, email, password) => {
+        try {
+            const res = await fetch(`${API_URL}/auth/signup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+
+            localStorage.setItem('token', data.token);
+            // We fetch fresh data to ensure everything is synced
+            await fetchData(data.token);
+
+            showToast('Account created successfully!', 'success');
+            return true;
+        } catch (err) {
+            showToast(err.message, 'error');
+            return false;
+        }
+    };
+
+    const updateProfile = async (updates) => {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_URL}/user`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(updates)
+            });
+            const updatedUser = await res.json();
+            if (!res.ok) throw new Error(updatedUser.message);
+
+            setCurrentUser(updatedUser);
+            showToast('Profile updated successfully!', 'success');
+            return true;
+        } catch (err) {
+            showToast(err.message, 'error');
+            return false;
+        }
+    };
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        setCurrentUser(null);
+        showToast('Logged out successfully', 'info');
+    };
+
+    // Initial load
+    useEffect(() => {
         fetchData();
-    }, [showToast]);
+    }, [fetchData]);
 
     // Simulate online status changes
     useEffect(() => {
@@ -106,42 +176,36 @@ export function AppProvider({ children }) {
 
     const sendMessage = async (userId, message) => {
         try {
-            const res = await fetch(`${API_URL}/chats/${userId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: message, sender: 'me' })
-            });
-
-            if (!res.ok) throw new Error('Failed to send');
-
-            const newMessage = await res.json();
+            // Optimistic update
+            const tempId = Date.now();
+            const newMessage = {
+                id: tempId,
+                text: message,
+                sender: 'me',
+                timestamp: new Date().toISOString()
+            };
 
             setChats(prev => ({
                 ...prev,
-                [userId]: [...(prev[userId] || []), newMessage],
+                [userId]: [...(prev[userId] || []), newMessage]
             }));
 
-            // Simulate reply
-            setTimeout(() => {
-                const replies = [
-                    "Sounds great! I'd love to trade skills with you.",
-                    "That works for me. When are you available?",
-                    "Perfect! Let's schedule a session.",
-                    "I'm interested! Tell me more about what you can teach.",
-                ];
-                const replyMessage = {
-                    id: Date.now(),
-                    text: replies[Math.floor(Math.random() * replies.length)],
-                    sender: 'them',
-                    timestamp: new Date().toISOString(),
-                };
-                setChats(prev => ({
-                    ...prev,
-                    [userId]: [...(prev[userId] || []), replyMessage],
-                }));
-                showToast("New message received!", "info");
-            }, 1000 + Math.random() * 2000);
+            // API Call
+            const res = await fetch(`${API_URL}/chats/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'Authorization': `Bearer ${localStorage.getItem('token')}` // Backend doesn't use auth yet
+                },
+                body: JSON.stringify({ text: message, sender: 'me' })
+            });
 
+            if (!res.ok) {
+                // Revert on failure (omitted for simplicity, but good practice)
+                throw new Error('Failed to send message');
+            }
+
+            // We could replace the temp ID with the real one if the backend returned it
         } catch (error) {
             console.error('Error sending message:', error);
             showToast("Failed to send message", "error");
@@ -149,10 +213,14 @@ export function AppProvider({ children }) {
     };
 
     const addTimeCredits = async (hours) => {
+        const token = localStorage.getItem('token');
         try {
             const res = await fetch(`${API_URL}/user/credits/add`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ amount: hours })
             });
             if (!res.ok) throw new Error('Failed to add credits');
@@ -167,6 +235,7 @@ export function AppProvider({ children }) {
     };
 
     const spendTimeCredits = async (hours) => {
+        const token = localStorage.getItem('token');
         try {
             if (currentUser.timeCredits < hours) {
                 showToast("Not enough credits!", "error");
@@ -175,7 +244,10 @@ export function AppProvider({ children }) {
 
             const res = await fetch(`${API_URL}/user/credits/spend`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ amount: hours })
             });
 
@@ -196,23 +268,6 @@ export function AppProvider({ children }) {
         return <LoadingScreen message="Connecting to the skill network..." />;
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col items-center justify-center p-4">
-                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8 max-w-md text-center backdrop-blur-md">
-                    <h2 className="text-2xl font-bold text-red-500 mb-4">Connection Error</h2>
-                    <p className="text-gray-300 mb-6">{error}</p>
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-medium hover:opacity-90 transition-opacity"
-                    >
-                        Retry Connection
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <AppContext.Provider value={{
             currentUser,
@@ -225,9 +280,12 @@ export function AppProvider({ children }) {
             addTimeCredits,
             spendTimeCredits,
             showToast,
+            login,
+            signup,
+            logout,
+            updateProfile
         }}>
             {children}
-            {/* Global Toast Container */}
             {toast && (
                 <div className="fixed top-4 right-4 z-[60]">
                     <Toast

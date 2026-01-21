@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
     LayoutDashboard, Search, MessageSquare, BookOpen,
     User, Zap, LogOut, Settings, ChevronLeft, ChevronRight
@@ -6,7 +6,7 @@ import {
 import { useApp } from '../context/AppContext';
 
 export default function Sidebar({ isCollapsed, toggleSidebar }) {
-    const { currentUser, onlineUsers } = useApp();
+    const { currentUser, onlineUsers, logout } = useApp();
 
     const navItems = [
         { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -85,14 +85,14 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
                     <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center mb-0' : 'mb-3'}`}>
                         <img src={currentUser.avatar} alt="User" className="shrink-0 w-10 h-10 rounded-full bg-gray-800 object-cover" />
                         <div className={`flex-1 min-w-0 transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100 block'}`}>
-                            <h4 className="text-sm font-bold text-white truncate">{currentUser.name}</h4>
+                            <h4 className="text-sm font-bold text-white truncate">{currentUser.username || currentUser.name}</h4>
                             <p className="text-xs text-purple-400 font-medium truncate">{currentUser.timeCredits} hrs credits</p>
                         </div>
                     </div>
                     {/* Buttons hide on collapse */}
                     <div className={`grid grid-cols-2 gap-2 overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100'}`}>
-                        <button className="flex items-center justify-center gap-2 p-2 rounded-lg bg-black/20 text-gray-400 hover:text-white transition-colors text-xs font-medium"><Settings className="w-3.5 h-3.5" />Settings</button>
-                        <button className="flex items-center justify-center gap-2 p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-xs font-medium"><LogOut className="w-3.5 h-3.5" />Logout</button>
+                        <Link to="/profile" className="flex items-center justify-center gap-2 p-2 rounded-lg bg-black/20 text-gray-400 hover:text-white transition-colors text-xs font-medium"><Settings className="w-3.5 h-3.5" />Settings</Link>
+                        <button onClick={logout} className="flex items-center justify-center gap-2 p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-xs font-medium"><LogOut className="w-3.5 h-3.5" />Logout</button>
                     </div>
                 </div>
             </div>

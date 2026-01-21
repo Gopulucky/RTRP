@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../data/store');
 
-// GET all skills
+// GET all skills (returns all user-created skills for browsing)
 router.get('/', (req, res) => {
-    const skills = db.getSkills();
+    const skills = db.getUserSkills();
     res.json(skills);
 });
 

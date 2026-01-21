@@ -15,10 +15,33 @@ app.use(express.json());
 const skillsRoutes = require('./routes/skillsRoutes');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 app.use('/api/skills', skillsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/auth', authRoutes);
+
+// Stats endpoint - returns community statistics
+const db = require('./db/database');
+const store = require('./data/store');
+
+app.get('/api/stats', (req, res) => {
+    // Get user count from SQLite
+    db.get('SELECT COUNT(*) as userCount FROM users', [], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        const skills = store.getUserSkills();
+
+        res.json({
+            totalUsers: row?.userCount || 0,
+            totalSkills: skills.length,
+            onlineUsers: skills.filter(s => s.user?.online).length
+        });
+    });
+});
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'ok', message: 'Server is running' });

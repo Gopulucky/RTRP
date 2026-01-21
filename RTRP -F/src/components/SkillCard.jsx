@@ -35,8 +35,8 @@ export default function SkillCard({ skill, onChat, onVideo }) {
                     <div className="relative">
                         <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-gray-700 to-gray-800 group-hover:from-purple-500 group-hover:to-blue-500 transition-colors duration-300">
                             <img
-                                src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=random`}
-                                alt={user.name}
+                                src={user.avatar || `https://ui-avatars.com/api/?name=${user.name || user.username || 'User'}&background=random`}
+                                alt={user.name || user.username}
                                 className="w-full h-full rounded-full object-cover border-2 border-[#1e1e2d]"
                             />
                         </div>
@@ -48,7 +48,7 @@ export default function SkillCard({ skill, onChat, onVideo }) {
                     {/* Name & Status */}
                     <div>
                         <h4 className="text-sm font-bold text-white flex items-center gap-1">
-                            {user.name}
+                            {user.name || user.username || 'Anonymous'}
                             {/* Simulated Verified Badge for visual trust */}
                             <CheckCircle2 className="w-3 h-3 text-blue-400" />
                         </h4>

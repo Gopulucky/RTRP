@@ -7,7 +7,7 @@ export default function MySkills() {
     const [showAddForm, setShowAddForm] = useState(false);
     const [mySkills, setMySkills] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     const API_URL = 'http://localhost:5000/api';
 
     const [newSkill, setNewSkill] = useState({
@@ -30,10 +30,20 @@ export default function MySkills() {
     // Fetch user skills from backend
     useEffect(() => {
         const fetchUserSkills = async () => {
+            const token = localStorage.getItem('token');
             try {
-                const res = await fetch(`${API_URL}/user/skills`);
+                const res = await fetch(`${API_URL}/user/skills`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const skillsData = await res.json();
-                setMySkills(skillsData);
+                // Filter to only my skills (since endpoint currently returns all)
+                // We check both username and name for compatibility with legacy/new data
+                const myOwnSkills = skillsData.filter(s =>
+                    s.user?.username === currentUser?.username ||
+                    s.user?.name === currentUser?.username ||
+                    s.user?.name === currentUser?.name
+                );
+                setMySkills(myOwnSkills);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching user skills:', error);
@@ -49,10 +59,14 @@ export default function MySkills() {
     const handleAddSkill = async (e) => {
         e.preventDefault();
         if (newSkill.title && newSkill.description) {
+            const token = localStorage.getItem('token');
             try {
                 const res = await fetch(`${API_URL}/user/skills`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(newSkill)
                 });
                 const addedSkill = await res.json();
@@ -67,8 +81,10 @@ export default function MySkills() {
 
     const handleDeleteSkill = async (id) => {
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(`${API_URL}/user/skills/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
                 setMySkills(mySkills.filter(skill => skill.id !== id));
@@ -154,18 +170,29 @@ export default function MySkills() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {mySkills.map(skill => (
                     <div key={skill.id} className="glass-card p-6 hover:border-purple-500/30 transition-all group">
-                        {/* Header Row */}
+                        {/* Header Row with User Info */}
                         <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <h3 className="text-xl font-semibold text-white group-hover:text-purple-300 transition-colors">
-                                        {skill.title}
-                                    </h3>
-                                    <span className={`px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r ${categoryColors[skill.category]} text-white`}>
-                                        {skill.category}
-                                    </span>
+                            <div className="flex items-center gap-3">
+                                {/* User Avatar */}
+                                <div className="relative">
+                                    <img
+                                        src={skill.user?.avatar || currentUser?.avatar || `https://ui-avatars.com/api/?name=${currentUser?.username}&background=random`}
+                                        alt={skill.user?.name || currentUser?.username}
+                                        className="w-10 h-10 rounded-full object-cover border-2 border-purple-500/30"
+                                    />
+                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#1e1e2d] rounded-full"></span>
                                 </div>
-                                <p className="text-gray-400 text-sm leading-relaxed">{skill.description}</p>
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <h3 className="text-lg font-semibold text-white group-hover:text-purple-300 transition-colors">
+                                            {skill.title}
+                                        </h3>
+                                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full bg-gradient-to-r ${categoryColors[skill.category]} text-white`}>
+                                            {skill.category}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-gray-500">{skill.user?.name || skill.user?.username || currentUser?.username}</p>
+                                </div>
                             </div>
                             <div className="flex items-center gap-1 ml-4">
                                 <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
@@ -179,6 +206,9 @@ export default function MySkills() {
                                 </button>
                             </div>
                         </div>
+
+                        {/* Description */}
+                        <p className="text-gray-400 text-sm leading-relaxed mb-4">{skill.description}</p>
 
                         {/* Stats Row */}
                         <div className="flex items-center gap-6 pt-4 border-t border-white/10">
