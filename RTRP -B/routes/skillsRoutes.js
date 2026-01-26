@@ -1,20 +1,83 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../data/store');
+const db = require('../db/database');
 
 // GET all skills (returns all user-created skills for browsing)
 router.get('/', (req, res) => {
-    const skills = db.getUserSkills();
-    res.json(skills);
+    // Join with users table to get creator details
+    const sql = `
+        SELECT skills.*, 
+               users.username as user_username, 
+               users.email as user_email, 
+               users.avatar as user_avatar,
+               users.id as user_actual_id
+        FROM skills
+        JOIN users ON skills.user_id = users.id
+    `;
+
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Database error" });
+        }
+
+        // Format the response to match the shape expected by the frontend
+        const skills = rows.map(row => ({
+            id: row.id,
+            title: row.title,
+            description: row.description,
+            category: row.category,
+            hours: row.hours,
+            user: {
+                id: row.user_actual_id,
+                username: row.user_username,
+                email: row.user_email,
+                avatar: row.user_avatar
+            }
+        }));
+
+        res.json(skills);
+    });
 });
 
 // GET skill by ID
 router.get('/:id', (req, res) => {
-    const skill = db.getSkillById(req.params.id);
-    if (!skill) {
-        return res.status(404).json({ message: 'Skill not found' });
-    }
-    res.json(skill);
+    const sql = `
+        SELECT skills.*, 
+               users.username as user_username, 
+               users.email as user_email, 
+               users.avatar as user_avatar,
+               users.id as user_actual_id
+        FROM skills
+        JOIN users ON skills.user_id = users.id
+        WHERE skills.id = ?
+    `;
+
+    db.get(sql, [req.params.id], (err, row) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Database error" });
+        }
+        if (!row) {
+            return res.status(404).json({ message: 'Skill not found' });
+        }
+
+        const skill = {
+            id: row.id,
+            title: row.title,
+            description: row.description,
+            category: row.category,
+            hours: row.hours,
+            user: {
+                id: row.user_actual_id,
+                username: row.user_username,
+                email: row.user_email,
+                avatar: row.user_avatar
+            }
+        };
+
+        res.json(skill);
+    });
 });
 
 module.exports = router;

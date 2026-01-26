@@ -108,66 +108,80 @@ router.post('/credits/spend', auth, (req, res) => {
     });
 });
 
-// GET user skills (Legacy from store)
-router.get('/skills', (req, res) => {
-    const userSkills = store.getUserSkills();
-    res.json(userSkills);
+// GET user skills (My Skills)
+router.get('/skills', auth, (req, res) => {
+    sqliteDb.all('SELECT * FROM skills WHERE user_id = ?', [req.user.id], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+        res.json(rows);
+    });
 });
 
-// POST add user skill (Legacy from store)
-// POST add user skill (Legacy from store)
+// POST add user skill
 router.post('/skills', auth, (req, res) => {
     const { title, description, category, hours } = req.body;
     if (!title || !description || !category || !hours) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // We need to fetch full user info to attach to skill if store expects it
-    sqliteDb.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, row) => {
-        if (err || !row) {
-            // Fallback if db fail
-            const newSkill = store.addUserSkill({
-                title, description, category, hours,
-                user: { username: req.user.username, name: req.user.username, online: true }
-            });
-            return res.status(201).json(newSkill);
+    const sql = `INSERT INTO skills (title, description, category, hours, user_id) VALUES (?, ?, ?, ?, ?)`;
+    sqliteDb.run(sql, [title, description, category, hours, req.user.id], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
         }
-
-        const newSkill = store.addUserSkill({
-            title, description, category, hours,
-            user: {
-                username: row.username,
-                name: row.username, // mapping username to name for frontend compatibility
-                avatar: row.avatar,
-                online: true,
-                id: row.id
-            }
-        });
+        const newSkill = { id: this.lastID, title, description, category, hours, user_id: req.user.id };
         res.status(201).json(newSkill);
     });
 });
 
-// DELETE user skill (Legacy from store)
-router.delete('/skills/:id', (req, res) => {
+// DELETE user skill
+router.delete('/skills/:id', auth, (req, res) => {
     const { id } = req.params;
-    const deleted = store.deleteUserSkill(id);
-    if (deleted) {
+
+    // Check ownership
+    sqliteDb.run('DELETE FROM skills WHERE id = ? AND user_id = ?', [id, req.user.id], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Skill not found or not authorized' });
+        }
         res.json({ message: 'Skill deleted successfully' });
-    } else {
-        res.status(404).json({ message: 'Skill not found' });
-    }
+    });
 });
 
-// PUT update user skill (Legacy from store)
-router.put('/skills/:id', (req, res) => {
+// PUT update user skill
+router.put('/skills/:id', auth, (req, res) => {
     const { id } = req.params;
-    const updates = req.body;
-    const updated = store.updateUserSkill(id, updates);
-    if (updated) {
-        res.json(updated);
-    } else {
-        res.status(404).json({ message: 'Skill not found' });
-    }
+    const { title, description, category, hours } = req.body;
+
+    // Construct update query dynamically
+    const updates = [];
+    const params = [];
+    if (title) { updates.push('title = ?'); params.push(title); }
+    if (description) { updates.push('description = ?'); params.push(description); }
+    if (category) { updates.push('category = ?'); params.push(category); }
+    if (hours) { updates.push('hours = ?'); params.push(hours); }
+
+    if (updates.length === 0) return res.status(400).json({ message: 'No updates provided' });
+
+    const sql = `UPDATE skills SET ${updates.join(', ')} WHERE id = ? AND user_id = ?`;
+    params.push(id, req.user.id);
+
+    sqliteDb.run(sql, params, function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ message: 'Skill not found or not authorized' });
+        }
+        res.json({ id, title, description, category, hours, user_id: req.user.id });
+    });
 });
 
 module.exports = router;

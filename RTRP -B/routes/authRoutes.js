@@ -21,7 +21,7 @@ router.post('/signup', (req, res) => {
     db.run(sql, [username, email, hashedPassword, avatar], function (err) {
         if (err) {
             console.error(err);
-            if (err.message.includes('UNIQUE constraint failed')) {
+            if (err.code === 'ER_DUP_ENTRY') {
                 return res.status(400).json({ message: 'User already exists' });
             }
             return res.status(500).json({ message: 'Database error', error: err.message });
