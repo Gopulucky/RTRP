@@ -2,7 +2,10 @@
 
 **Project Title:** SkillSwap (Real-Time Resource Pool)
 **Course:** [Insert Course Name]
-**Team Members:** [Insert Member Name 1], [Insert Member Name 2], [Insert Member Name 3]
+**Team Members & Roles:**
+- **[Member 1 Name]:** Frontend Development (React UI)
+- **[Member 2 Name]:** Backend API (Node/Express)
+- **[Member 3 Name]:** Database Design & Integration
 **Guide/Mentor:** [Insert Mentor Name]
 
 ---
@@ -62,11 +65,10 @@ Existing solutions either cost money or lack the structured "skill-for-skill" di
 - **Iterative Testing:** Each feature (Auth, Chat) was tested individually before integration.
 
 **Tools & Technologies:**
-- **Frontend:** React 19, Vite, TailwindCSS (for modern, responsive UI).
-- **Backend:** Node.js, Express.js (RESTful API architecture).
-- **Database:** MySQL (Relational data for Users and Skills), SQLite (for development speed).
-- **Authentication:** JWT (JSON Web Tokens) for secure session management.
-- **Version Control:** Git & GitHub.
+- **Frontend:** React + Vite + Tailwind CSS
+- **Backend:** Node.js + Express.js
+- **Database:** MySQL
+- **Authentication:** JWT (JSON Web Tokens)
 
 ---
 
@@ -137,19 +139,17 @@ erDiagram
 - **Skills:** Stores Title, Description, Category, OwnerID.
 - **Relationship:** A "One-to-Many" relationship exists between Users and Skills (One user can offer multiple skills).
 
-**Slide Title:** Process Flow Diagrams
-
-**User Authentication Flow:**
+**Process Flow: Login & Post Skill**
 ```mermaid
 flowchart LR
-    Start([Open App]) --> Check{Token Valid?}
-    Check -->|Yes| Dash[Dashboard]
-    Check -->|No| Login[Login Page]
-    Login --> Input[Enter Creds]
-    Input --> Valid{Valid?}
-    Valid -->|Yes| JWT[Generate Token]
-    Valid -->|No| Error[Show Error]
-    JWT --> Dash
+    User([User]) -->|Enter Creds| Login[Login Page]
+    Login -->|Validate| DB[(Database)]
+    DB -->|Success| Dash[Dashboard]
+    Dash -->|Click| Post[Post Skill Button]
+    Post -->|Fill Form| Form[Skill Details Form]
+    Form -->|Submit| API[Backend API]
+    API -->|Save| DB
+    DB -->|Confirm| Dash
 ```
 
 **Skill Exchange Sequence:**
@@ -178,20 +178,24 @@ sequenceDiagram
 
 **1. Authentication System:**
 - Users sign up/login.
-- We implement JWT to keep users logged in securely.
-- Passwords are encrypted for safety.
+- Secure JWT implementation.
+- Passwords hashing with bcrypt.
 
 **2. Skill Marketplace:**
-- Users can post skills giving a Title, Description, and Category.
-- The "Browse" page allows filtering skills by category (Music, Coding, Design).
+- Post skills with Title, Description, Category.
+- Filter skills by category.
 
 **3. Dashboard:**
-- Displays personal stats (Credits Earned, Skills Listed).
-- Visualizes data using responsive cards.
+- View Credits Earned.
+- Manage listed skills.
 
-**4. Communication:**
-- **Chat System:** Integrated messaging to discuss lesson details.
-- **Real-Time:** Users can see status and updates instantly.
+**4. Project Demonstration (Screenshots):**
+*(Insert 4-5 key screenshots here)*
+- **Login/Signup Page:** Shows secure access.
+- **Dashboard:** Shows time credit balance and stats.
+- **Browse Skills:** Shows grid of available skills.
+- **Profile Page:** Shows user details and bio.
+- **Chat Interface:** Shows message history.
 
 ---
 
@@ -204,18 +208,30 @@ sequenceDiagram
 - **Cross-Browser Testing:** Checked UI consistency on Chrome and Edge.
 
 **Results:**
-- Successfully registered users and stored data in MySQL.
-- Skill posting creates real-time updates on the Browse feed.
-- Auth system correctly blocks unauthorized access to private pages.
+- "Successfully created X users"
+- "Posted Y skills in the system"
+- "Authentication working properly"
+- "Database storing data correctly"
+
+**Implementation Status (Honesty Check):**
+- **Working:** Login, Signup, Skill Posting, Browse Skills, Dashboard.
+- **Partially Working:** Chat system (UI ready, realtime connecting).
+- **Not Implemented:** Video calls, Rating system.
 
 ---
 
 ## 9. Challenges & Solutions
-**Slide Title:** Challenges Faced
+**Slide Title:** Key Learnings & Challenges
 
-- **State Management:** *Challenge:* Keeping user data (like credits) in sync across different pages. *Solution:* Used React Context API to manage global state.
-- **Database Connection:** *Challenge:* switching from SQLite to MySQL. *Solution:* Used `mysql2` library and environment variables for configuration.
-- **Responsive Design:** *Challenge:* Making the dashboard look good on mobile. *Solution:* Used TailwindCSS Grid and Flexbox utilities.
+**Personal Learnings:**
+- "Learned how to connect React with Node.js backend."
+- "Understood JWT authentication implementation flow."
+- "Learned database design and defining relationships."
+
+**Technical Challenges:**
+- **State Management:** Keeping user data synced. *Solved with React Context.*
+- **Database Connection:** Switching to MySQL. *Solved with mysql2 driver.*
+- **Responsive Design:** Mobile-friendly layout. *Solved with Tailwind Grid.*
 
 ---
 
