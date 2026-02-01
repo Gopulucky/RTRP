@@ -65,110 +65,324 @@ Existing solutions either cost money or lack the structured "skill-for-skill" di
 - **Iterative Testing:** Each feature (Auth, Chat) was tested individually before integration.
 
 **Tools & Technologies:**
-- **Frontend:** React + Vite + Tailwind CSS
-- **Backend:** Node.js + Express.js
-- **Database:** MySQL
-- **Authentication:** JWT (JSON Web Tokens)
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 19 + Vite + Tailwind CSS |
+| Backend | Node.js + Express.js |
+| Database | MySQL (with mysql2 driver) |
+| Authentication | JWT (JSON Web Tokens) + bcrypt |
+| State Management | React Context API |
 
 ---
 
-## 6. System Design
-**Slide Title:** System Architecture
+## 6. System Design & Architecture
+
+### 6.1 Frontend Architecture
+**Slide Title:** Frontend Architecture
 
 ```mermaid
-graph TD
-    subgraph Client [Frontend Layer]
-        Browser[Web Browser]
-        ReactApp[React 19 SPA]
-        Vite[Vite Build Tool]
-        Tailwind[TailwindCSS]
+graph TB
+    subgraph Browser["🌐 Browser"]
+        subgraph ReactApp["React 19 Application"]
+            Router[React Router DOM]
+            Context[AppContext Provider]
+            
+            subgraph Pages["📄 Pages"]
+                Login[Login.jsx]
+                Signup[Signup.jsx]
+                Dashboard[Dashboard.jsx]
+                Browse[BrowseSkills.jsx]
+                MySkills[MySkills.jsx]
+                Profile[Profile.jsx]
+                Messages[Messages.jsx]
+            end
+            
+            subgraph Components["🧩 Components"]
+                Sidebar[Sidebar]
+                SkillCard[SkillCard]
+                ChatPanel[ChatPanel]
+                VideoCall[VideoCall]
+                Toast[Toast]
+            end
+        end
     end
-
-    subgraph Server [Backend Layer]
-        NodeJS[Node.js Runtime]
-        Express[Express.js Server]
-        Auth[JWT Auth Middleware]
+    
+    Router --> Pages
+    Context --> Pages
+    Pages --> Components
+    
+    subgraph Styling["🎨 Styling"]
+        Tailwind[Tailwind CSS]
+        Custom[Custom CSS]
     end
-
-    subgraph Database [Data Layer]
-        MySQL[(MySQL Database)]
+    
+    subgraph Build["⚡ Build Tool"]
+        Vite[Vite Dev Server]
     end
-
-    Browser -->|Loads| ReactApp
-    ReactApp -->|REST API Calls| Express
-    Express -->|Validates| Auth
-    Express -->|Queries/Updates| MySQL
+    
+    ReactApp --> Styling
+    Vite --> ReactApp
 ```
 
-**Explanation:**
-- **Client-Server Model:** The browser (Client) sends HTTP requests to our Node.js Server.
-- **API Layer:** Express.js handles these requests (GET skills, POST login, etc.).
-- **Data Layer:** The server queries the MySQL database to fetch user profiles and skill data.
-- **Security:** Passwords are hashed using `bcrypt` before storage.
+**Key Points:**
+- **Single Page Application (SPA):** React Router handles client-side navigation
+- **Global State:** AppContext manages user data, skills, and chat state
+- **Component-Based:** Reusable components like SkillCard and ChatPanel
+- **Modern Styling:** Tailwind CSS for responsive, utility-first design
 
-**Slide Title:** Database Design (ER Diagram)
+---
+
+### 6.2 Backend Architecture
+**Slide Title:** Backend Architecture
+
+```mermaid
+graph TB
+    subgraph Server["🖥️ Node.js Server"]
+        Express[Express.js App]
+        
+        subgraph Middleware["🔐 Middleware"]
+            CORS[CORS]
+            JSON[JSON Parser]
+            Auth[JWT Auth]
+        end
+        
+        subgraph Routes["📡 API Routes"]
+            AuthRoutes["/api/auth"]
+            UserRoutes["/api/user"]
+            SkillRoutes["/api/skills"]
+            ChatRoutes["/api/chats"]
+        end
+        
+        subgraph Database["💾 Database Layer"]
+            DBModule[database.js]
+            Pool[MySQL Pool]
+        end
+    end
+    
+    Express --> Middleware
+    Middleware --> Routes
+    Routes --> DBModule
+    DBModule --> Pool
+    
+    subgraph External["🌍 External"]
+        Client[Frontend Client]
+        MySQL[(MySQL Server)]
+    end
+    
+    Client -->|HTTP Requests| Express
+    Pool -->|Queries| MySQL
+```
+
+**API Endpoints:**
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/api/auth/signup` | POST | Register new user |
+| `/api/auth/login` | POST | Login & get JWT token |
+| `/api/user` | GET | Get current user profile |
+| `/api/user/all` | GET | Get all users (public) |
+| `/api/user/logout` | POST | Set user offline |
+| `/api/skills` | GET/POST | Get all skills / Create skill |
+| `/api/skills/:id` | GET/DELETE | Get/Delete specific skill |
+| `/api/chats` | GET | Get all user conversations |
+| `/api/chats/:userId` | GET/POST | Get/Send messages |
+
+---
+
+### 6.3 Signup/Login Flow
+**Slide Title:** Authentication Flow (Signup & Login)
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant F as 🌐 Frontend
+    participant B as 🖥️ Backend
+    participant DB as 💾 MySQL
+
+    rect rgb(200, 230, 200)
+        Note over U,DB: SIGNUP FLOW
+        U->>F: Fill signup form (username, email, password)
+        F->>B: POST /api/auth/signup
+        B->>B: Hash password with bcrypt
+        B->>DB: INSERT INTO users
+        DB-->>B: Success (user ID)
+        B->>B: Generate JWT token
+        B-->>F: Return { token, user }
+        F->>F: Store token in localStorage
+        F-->>U: Redirect to Dashboard
+    end
+
+    rect rgb(200, 200, 230)
+        Note over U,DB: LOGIN FLOW
+        U->>F: Enter email & password
+        F->>B: POST /api/auth/login
+        B->>DB: SELECT * FROM users WHERE email = ?
+        DB-->>B: Return user record
+        B->>B: Compare password with bcrypt
+        B->>DB: UPDATE users SET is_online = TRUE
+        B->>B: Generate JWT token
+        B-->>F: Return { token, user }
+        F->>F: Store token in localStorage
+        F->>F: Update AppContext with user data
+        F-->>U: Redirect to Dashboard
+    end
+
+    rect rgb(230, 200, 200)
+        Note over U,DB: LOGOUT FLOW
+        U->>F: Click Logout
+        F->>B: POST /api/user/logout (with JWT)
+        B->>DB: UPDATE users SET is_online = FALSE
+        B-->>F: Success
+        F->>F: Clear localStorage
+        F-->>U: Redirect to Login
+    end
+```
+
+**Security Features:**
+- ✅ Password hashing with bcrypt (10 salt rounds)
+- ✅ JWT tokens with 1-hour expiration
+- ✅ Protected routes with auth middleware
+- ✅ Real-time online status tracking
+
+---
+
+### 6.4 Database Schema
+**Slide Title:** Database Architecture (MySQL)
 
 ```mermaid
 erDiagram
     USERS ||--o{ SKILLS : "creates"
+    USERS ||--o{ MESSAGES : "sends"
+    USERS ||--o{ MESSAGES : "receives"
+    
     USERS {
-        int id PK
-        string username
-        string email
-        string password_hash
-        int time_credits
-        string role
+        int id PK "Auto Increment"
+        varchar username UK "Unique Username"
+        varchar email UK "Unique Email"
+        varchar password "Hashed with bcrypt"
+        text avatar "Profile Image URL"
+        int timeCredits "Default: 10"
+        text bio "User Biography"
+        varchar role "Job Title"
+        varchar location "City/Country"
+        varchar website "Personal URL"
+        boolean is_online "Online Status"
+        timestamp last_seen "Last Activity"
+        timestamp created_at "Registration Date"
     }
 
     SKILLS {
-        int id PK
-        string title
-        string description
-        string category
-        float hours_value
-        int user_id FK
+        int id PK "Auto Increment"
+        varchar title "Skill Name"
+        text description "Detailed Description"
+        varchar category "Programming/Music/etc"
+        decimal hours "Time Credit Value"
+        int user_id FK "References Users"
+        timestamp created_at "Posted Date"
     }
 
-    CHATS ||--|{ MESSAGES : "contains"
-    USERS ||--o{ MESSAGES : "sends"
-    USERS ||--o{ CHATS : "participates"
+    MESSAGES {
+        int id PK "Auto Increment"
+        int sender_id FK "Who Sent"
+        int receiver_id FK "Who Receives"
+        text text "Message Content"
+        timestamp created_at "Sent Time"
+    }
 ```
 
-**Key Entities:**
-- **Users:** Stores ID, Name, Email, Password, Bio, TimeBalance.
-- **Skills:** Stores Title, Description, Category, OwnerID.
-- **Relationship:** A "One-to-Many" relationship exists between Users and Skills (One user can offer multiple skills).
+**Database Relationships:**
+| Relationship | Type | Description |
+|--------------|------|-------------|
+| Users → Skills | One-to-Many | One user can create many skills |
+| Users → Messages (sender) | One-to-Many | One user can send many messages |
+| Users → Messages (receiver) | One-to-Many | One user can receive many messages |
 
-**Process Flow: Login & Post Skill**
+**Constraints:**
+- `ON DELETE CASCADE` for skills (delete user = delete their skills)
+- `ON DELETE CASCADE` for messages (delete user = delete their messages)
+- `UNIQUE` constraints on username and email
+
+---
+
+### 6.5 Full System Flow
+**Slide Title:** Complete System Flow
+
 ```mermaid
-flowchart LR
-    User([User]) -->|Enter Creds| Login[Login Page]
-    Login -->|Validate| DB[(Database)]
-    DB -->|Success| Dash[Dashboard]
-    Dash -->|Click| Post[Post Skill Button]
-    Post -->|Fill Form| Form[Skill Details Form]
-    Form -->|Submit| API[Backend API]
-    API -->|Save| DB
-    DB -->|Confirm| Dash
+flowchart TB
+    subgraph User["👤 USER JOURNEY"]
+        Start([Start]) --> Login{Has Account?}
+        Login -->|No| Signup[Signup Page]
+        Login -->|Yes| LoginPage[Login Page]
+        Signup --> Auth[Authentication]
+        LoginPage --> Auth
+    end
+    
+    subgraph App["📱 APPLICATION"]
+        Auth --> Dashboard[Dashboard]
+        Dashboard --> Browse[Browse Skills]
+        Dashboard --> MySkills[My Skills]
+        Dashboard --> Profile[Profile]
+        Dashboard --> Messages[Messages]
+        
+        Browse --> ViewSkill[View Skill Details]
+        ViewSkill --> Chat[Open Chat]
+        ViewSkill --> Video[Start Video Call]
+        
+        MySkills --> CreateSkill[Create New Skill]
+        MySkills --> EditSkill[Edit/Delete Skill]
+        
+        Profile --> EditProfile[Edit Profile]
+        
+        Messages --> Conversation[View Conversation]
+        Conversation --> SendMsg[Send Message]
+    end
+    
+    subgraph Backend["🖥️ BACKEND PROCESSING"]
+        Auth -->|POST /api/auth| AuthAPI[Auth Routes]
+        CreateSkill -->|POST /api/skills| SkillAPI[Skill Routes]
+        EditProfile -->|PUT /api/user| UserAPI[User Routes]
+        SendMsg -->|POST /api/chats| ChatAPI[Chat Routes]
+        
+        AuthAPI --> DB[(MySQL)]
+        SkillAPI --> DB
+        UserAPI --> DB
+        ChatAPI --> DB
+    end
+    
+    subgraph Response["📤 RESPONSE"]
+        DB --> JSON[JSON Response]
+        JSON --> Update[Update UI State]
+        Update --> Dashboard
+    end
 ```
 
-**Skill Exchange Sequence:**
+**Complete Data Flow:**
 ```mermaid
 sequenceDiagram
-    participant Learner
-    participant System
-    participant Teacher
-    
-    Learner->>System: Search for Skill
-    System-->>Learner: Show List
-    Learner->>System: Request connection
-    System->>Teacher: Notify Request
-    Teacher->>System: Accept
-    System-->>Learner: Connection Established
-    Learner->>Teacher: Chat/Video Call
-    Teacher->>System: Mark Session Complete
-    System->>Teacher: Add Credit
-    System->>Learner: Deduct Credit
+    participant User as 👤 User
+    participant Browser as 🌐 React App
+    participant API as 🖥️ Express API
+    participant Auth as 🔐 JWT Middleware
+    participant DB as 💾 MySQL
+
+    User->>Browser: Opens App
+    Browser->>API: GET /api/user (with JWT)
+    API->>Auth: Verify Token
+    Auth-->>API: User ID
+    API->>DB: SELECT user WHERE id = ?
+    DB-->>API: User Data
+    API-->>Browser: { user, skills, chats }
+    Browser->>Browser: Update Context State
+    Browser-->>User: Render Dashboard
+
+    User->>Browser: Creates New Skill
+    Browser->>API: POST /api/skills (with JWT)
+    API->>Auth: Verify Token
+    Auth-->>API: User ID
+    API->>DB: INSERT INTO skills
+    DB-->>API: New Skill ID
+    API-->>Browser: { skill }
+    Browser->>Browser: Update Skills State
+    Browser-->>User: Show Success Toast
 ```
 
 ---
@@ -177,25 +391,33 @@ sequenceDiagram
 **Slide Title:** Key Features & Implementation
 
 **1. Authentication System:**
-- Users sign up/login.
-- Secure JWT implementation.
-- Passwords hashing with bcrypt.
+- Secure user registration and login
+- JWT token-based authentication
+- Password hashing with bcrypt
+- Session persistence with localStorage
 
 **2. Skill Marketplace:**
-- Post skills with Title, Description, Category.
-- Filter skills by category.
+- Create skills with Title, Description, Category, Hours
+- Browse all available skills from community
+- Filter skills by category (Programming, Music, Design, etc.)
+- Real-time online status indicator for skill owners
 
-**3. Dashboard:**
-- View Credits Earned.
-- Manage listed skills.
+**3. Real-Time Chat System:**
+- Persistent chat messages stored in MySQL
+- Message history per conversation
+- Real-time message sending and receiving
 
-**4. Project Demonstration (Screenshots):**
-*(Insert 4-5 key screenshots here)*
-- **Login/Signup Page:** Shows secure access.
-- **Dashboard:** Shows time credit balance and stats.
-- **Browse Skills:** Shows grid of available skills.
-- **Profile Page:** Shows user details and bio.
-- **Chat Interface:** Shows message history.
+**4. User Profiles:**
+- Customizable avatars (DiceBear integration)
+- Bio, role, location, and website fields
+- View your own skills on profile page
+- Time credits balance display
+
+**5. Dashboard:**
+- View community statistics (members, skills, online)
+- Quick access to browse marketplace
+- Featured skills grid
+- Member discovery section
 
 ---
 
@@ -203,20 +425,29 @@ sequenceDiagram
 **Slide Title:** Testing Strategy
 
 **Methods Used:**
-- **Unit Testing:** Manually tested individual API endpoints using Postman (e.g., ensuring Login returns a token).
-- **Integration Testing:** Verified that the Frontend correctly displays data fetched from the Backend.
-- **Cross-Browser Testing:** Checked UI consistency on Chrome and Edge.
+- **API Testing:** Tested individual endpoints using browser dev tools and Postman
+- **Integration Testing:** Verified Frontend correctly displays data from Backend API
+- **Cross-Browser Testing:** Checked UI consistency on Chrome, Edge, and Firefox
+- **Database Testing:** Verified data persistence in MySQL Workbench
 
 **Results:**
-- "Successfully created X users"
-- "Posted Y skills in the system"
-- "Authentication working properly"
-- "Database storing data correctly"
+- ✅ Successfully implemented user authentication
+- ✅ Skills stored and retrieved from MySQL database
+- ✅ Chat messages persisted across sessions
+- ✅ Real-time online/offline status tracking
+- ✅ Responsive design on all screen sizes
 
-**Implementation Status (Honesty Check):**
-- **Working:** Login, Signup, Skill Posting, Browse Skills, Dashboard.
-- **Partially Working:** Chat system (UI ready, realtime connecting).
-- **Not Implemented:** Video calls, Rating system.
+**Implementation Status:**
+| Feature | Status |
+|---------|--------|
+| User Authentication | ✅ Complete |
+| Skill CRUD Operations | ✅ Complete |
+| Browse & Filter Skills | ✅ Complete |
+| Chat Messaging | ✅ Complete |
+| User Profiles | ✅ Complete |
+| Online Status Tracking | ✅ Complete |
+| Video Calls | ⚠️ UI Ready (WebRTC pending) |
+| Rating System | 📋 Planned |
 
 ---
 
@@ -224,37 +455,54 @@ sequenceDiagram
 **Slide Title:** Key Learnings & Challenges
 
 **Personal Learnings:**
-- "Learned how to connect React with Node.js backend."
-- "Understood JWT authentication implementation flow."
-- "Learned database design and defining relationships."
+- "Learned how to build a full-stack application with React and Node.js"
+- "Understood JWT authentication flow and secure password handling"
+- "Learned MySQL database design with foreign key relationships"
+- "Implemented real-time features like online status tracking"
 
 **Technical Challenges:**
-- **State Management:** Keeping user data synced. *Solved with React Context.*
-- **Database Connection:** Switching to MySQL. *Solved with mysql2 driver.*
-- **Responsive Design:** Mobile-friendly layout. *Solved with Tailwind Grid.*
+
+| Challenge | Solution |
+|-----------|----------|
+| Database Migration | Migrated from SQLite to MySQL using mysql2 driver |
+| State Management | Used React Context API for global state |
+| API Authentication | Implemented JWT middleware for protected routes |
+| Real-time Status | Added is_online column with login/logout tracking |
+| Responsive Design | Used Tailwind CSS Grid and Flexbox |
 
 ---
 
 ## 10. Future Scope
 **Slide Title:** Future Enhancements
 
-- **Video Call Integration:** Direct in-app video conferencing (WebRTC).
-- **Rating System:** Allow learners to rate teachers to ensure quality.
-- **Mobile App:** Develop a React Native version for iOS/Android.
-- **AI Recommendations:** Suggest skills based on user interests.
+- **Video Call Integration:** WebRTC-based in-app video conferencing
+- **Rating & Review System:** Allow learners to rate teachers
+- **Skill Matching Algorithm:** AI-powered skill recommendations
+- **Notification System:** Push notifications for messages and requests
+- **Mobile App:** React Native version for iOS/Android
+- **Payment Integration:** Optional paid premium skills
 
 ---
 
 ## 11. Conclusion
 **Slide Title:** Conclusion
 
-SkillSwap serves as a functional proof-of-concept for a demonetized, community-driven education platform. It successfully implements full-stack web technologies to solve the problem of accessible peer-to-peer learning.
+SkillSwap serves as a fully functional proof-of-concept for a demonetized, community-driven education platform. It successfully implements:
+
+- ✅ Full-stack web development (React + Node.js + MySQL)
+- ✅ Secure authentication with JWT
+- ✅ Real-time features (chat, online status)
+- ✅ Modern, responsive UI design
+- ✅ Persistent data storage
+
+The platform demonstrates the viability of peer-to-peer learning through time banking.
 
 **References:**
 - React Documentation (react.dev)
-- Node.js & Express Guides
+- Node.js & Express.js Guides (nodejs.org, expressjs.com)
+- MySQL Documentation (dev.mysql.com)
+- JWT.io (jwt.io)
 - "Time Banking" concepts (Wikipedia/Research papers)
 
 ---
 **Thank You!**
-*Questions?*
