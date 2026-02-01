@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const sqliteDb = require('../db/database');
+const db = require('../db/database');
 const auth = require('../middleware/auth');
-const store = require('../data/store'); // Fallback for skills
 
 // GET current user
 router.get('/', auth, (req, res) => {
-    sqliteDb.get('SELECT id, username, email, avatar, timeCredits, bio, role, location, website FROM users WHERE id = ?', [req.user.id], (err, row) => {
+    db.get('SELECT id, username, email, avatar, timeCredits, bio, role, location, website, is_online FROM users WHERE id = ?', [req.user.id], (err, row) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error' });
@@ -14,18 +13,34 @@ router.get('/', auth, (req, res) => {
         if (!row) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.json(row);
+        res.json({ ...row, online: row.is_online === 1 || row.is_online === true });
     });
 });
 
 // GET all users (public profiles)
 router.get('/all', (req, res) => {
-    sqliteDb.all('SELECT id, username, avatar, bio, role, location, website FROM users', [], (err, rows) => {
+    db.all('SELECT id, username, avatar, bio, role, location, website, is_online FROM users', [], (err, rows) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error' });
         }
-        res.json(rows);
+        // Add online field for frontend compatibility
+        const users = rows.map(row => ({
+            ...row,
+            online: row.is_online === 1 || row.is_online === true
+        }));
+        res.json(users);
+    });
+});
+
+// POST logout (set user offline)
+router.post('/logout', auth, (req, res) => {
+    db.run('UPDATE users SET is_online = FALSE, last_seen = NOW() WHERE id = ?', [req.user.id], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error' });
+        }
+        res.json({ message: 'Logged out successfully' });
     });
 });
 
@@ -50,14 +65,14 @@ router.put('/', auth, (req, res) => {
 
     const sql = `UPDATE users SET ${updates.join(', ')} WHERE id = ?`;
 
-    sqliteDb.run(sql, params, function (err) {
+    db.run(sql, params, function (err) {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error' });
         }
 
         // Return updated user
-        sqliteDb.get('SELECT id, username, email, avatar, timeCredits, bio, role, location, website FROM users WHERE id = ?', [req.user.id], (err, row) => {
+        db.get('SELECT id, username, email, avatar, timeCredits, bio, role, location, website FROM users WHERE id = ?', [req.user.id], (err, row) => {
             if (err) return res.status(500).json({ message: 'Fetch error' });
             res.json(row);
         });
@@ -71,13 +86,13 @@ router.post('/credits/add', auth, (req, res) => {
         return res.status(400).json({ message: 'Invalid amount' });
     }
 
-    sqliteDb.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, row) => {
+    db.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, row) => {
         if (err) return res.status(500).json({ message: 'Database error' });
         if (!row) return res.status(404).json({ message: 'User not found' });
 
         const newCredits = (row.timeCredits || 0) + amount;
 
-        sqliteDb.run('UPDATE users SET timeCredits = ? WHERE id = ?', [newCredits, req.user.id], function (err) {
+        db.run('UPDATE users SET timeCredits = ? WHERE id = ?', [newCredits, req.user.id], function (err) {
             if (err) return res.status(500).json({ message: 'Database error' });
             res.json({ ...row, timeCredits: newCredits });
         });
@@ -91,7 +106,7 @@ router.post('/credits/spend', auth, (req, res) => {
         return res.status(400).json({ message: 'Invalid amount' });
     }
 
-    sqliteDb.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, row) => {
+    db.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, row) => {
         if (err) return res.status(500).json({ message: 'Database error' });
         if (!row) return res.status(404).json({ message: 'User not found' });
 
@@ -101,7 +116,7 @@ router.post('/credits/spend', auth, (req, res) => {
 
         const newCredits = row.timeCredits - amount;
 
-        sqliteDb.run('UPDATE users SET timeCredits = ? WHERE id = ?', [newCredits, req.user.id], function (err) {
+        db.run('UPDATE users SET timeCredits = ? WHERE id = ?', [newCredits, req.user.id], function (err) {
             if (err) return res.status(500).json({ message: 'Database error' });
             res.json({ ...row, timeCredits: newCredits });
         });
@@ -110,7 +125,7 @@ router.post('/credits/spend', auth, (req, res) => {
 
 // GET user skills (My Skills)
 router.get('/skills', auth, (req, res) => {
-    sqliteDb.all('SELECT * FROM skills WHERE user_id = ?', [req.user.id], (err, rows) => {
+    db.all('SELECT * FROM skills WHERE user_id = ?', [req.user.id], (err, rows) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error' });
@@ -127,7 +142,7 @@ router.post('/skills', auth, (req, res) => {
     }
 
     const sql = `INSERT INTO skills (title, description, category, hours, user_id) VALUES (?, ?, ?, ?, ?)`;
-    sqliteDb.run(sql, [title, description, category, hours, req.user.id], function (err) {
+    db.run(sql, [title, description, category, hours, req.user.id], function (err) {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error' });
@@ -142,7 +157,7 @@ router.delete('/skills/:id', auth, (req, res) => {
     const { id } = req.params;
 
     // Check ownership
-    sqliteDb.run('DELETE FROM skills WHERE id = ? AND user_id = ?', [id, req.user.id], function (err) {
+    db.run('DELETE FROM skills WHERE id = ? AND user_id = ?', [id, req.user.id], function (err) {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error' });
@@ -172,7 +187,7 @@ router.put('/skills/:id', auth, (req, res) => {
     const sql = `UPDATE skills SET ${updates.join(', ')} WHERE id = ? AND user_id = ?`;
     params.push(id, req.user.id);
 
-    sqliteDb.run(sql, params, function (err) {
+    db.run(sql, params, function (err) {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error' });

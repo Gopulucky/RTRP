@@ -21,13 +21,13 @@ export default function Messages() {
 
     // Combined list for display
     const displayConversations = conversationUsers.filter(skill =>
-        skill.user.name.toLowerCase().includes(searchQuery.toLowerCase())
+        skill.user.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Also show some "potential" chats/contacts
     const potentialContacts = skills.filter(skill =>
         !chatUserIds.includes(skill.user.id.toString()) &&
-        skill.user.name.toLowerCase().includes(searchQuery.toLowerCase())
+        skill.user.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const getLastMessage = (userId) => {
@@ -80,14 +80,14 @@ export default function Messages() {
                                         key={skill.user.id}
                                         onClick={() => setActiveChatSkill(skill)}
                                         className={`w-full p-3 flex items-center gap-3 rounded-xl transition-all mb-1 ${isActive
-                                                ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30'
-                                                : 'hover:bg-white/5 border border-transparent'
+                                            ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30'
+                                            : 'hover:bg-white/5 border border-transparent'
                                             }`}
                                     >
                                         <div className="relative">
                                             <img
                                                 src={skill.user.avatar}
-                                                alt={skill.user.name}
+                                                alt={skill.user.username}
                                                 className="w-12 h-12 rounded-full bg-gray-700 object-cover"
                                             />
                                             {skill.user.online && (
@@ -96,7 +96,7 @@ export default function Messages() {
                                         </div>
                                         <div className="flex-1 min-w-0 text-left">
                                             <div className="flex items-center justify-between mb-0.5">
-                                                <p className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-200'}`}>{skill.user.name}</p>
+                                                <p className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-200'}`}>{skill.user.username}</p>
                                                 {lastMsg && (
                                                     <span className="text-[10px] text-gray-500">{formatTime(lastMsg.timestamp)}</span>
                                                 )}
@@ -128,12 +128,12 @@ export default function Messages() {
                                     <div className="relative gray-scale contrast-125">
                                         <img
                                             src={skill.user.avatar}
-                                            alt={skill.user.name}
+                                            alt={skill.user.username}
                                             className="w-10 h-10 rounded-full bg-gray-700 opacity-80"
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0 text-left">
-                                        <p className="text-sm font-medium text-gray-300">{skill.user.name}</p>
+                                        <p className="text-sm font-medium text-gray-300">{skill.user.username}</p>
                                         <p className="text-xs text-gray-500 truncate">{skill.title}</p>
                                     </div>
                                 </button>
@@ -152,11 +152,11 @@ export default function Messages() {
                             <div className="flex items-center gap-3">
                                 <img
                                     src={activeChatSkill.user.avatar}
-                                    alt={activeChatSkill.user.name}
+                                    alt={activeChatSkill.user.username}
                                     className="w-10 h-10 rounded-full bg-gray-700"
                                 />
                                 <div>
-                                    <h2 className="text-white font-semibold">{activeChatSkill.user.name}</h2>
+                                    <h2 className="text-white font-semibold">{activeChatSkill.user.username}</h2>
                                     <div className="flex items-center gap-2 text-xs">
                                         {activeChatSkill.user.online ? (
                                             <span className="text-green-400 flex items-center gap-1">● Online</span>
@@ -242,8 +242,8 @@ function EmbeddedChat({ skill }) {
                         className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
                     >
                         <div className={`max-w-[70%] px-5 py-3 rounded-2xl ${msg.sender === 'me'
-                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-tr-sm'
-                                : 'bg-white/10 text-gray-200 rounded-tl-sm'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-tr-sm'
+                            : 'bg-white/10 text-gray-200 rounded-tl-sm'
                             }`}>
                             <p className="text-sm leading-relaxed">{msg.text}</p>
                             <p className="text-[10px] mt-1 opacity-70 text-right">

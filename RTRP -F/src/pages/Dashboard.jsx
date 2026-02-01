@@ -130,7 +130,7 @@ export default function Dashboard() {
                             </div>
 
                             <p className="text-sm text-gray-400 mb-6">
-                                Enough for approx. 5 guitar lessons.
+                                Use credits to learn new skills.
                             </p>
 
                             <div className="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
@@ -142,15 +142,15 @@ export default function Dashboard() {
                     {/* Secondary Mini-Stats */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="rounded-3xl bg-[#1e1e2d]/40 border border-white/5 p-5 hover:bg-[#1e1e2d]/60 transition-colors">
-                            <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Sessions</div>
+                            <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Skills</div>
                             <div className="text-2xl font-bold text-white flex items-center gap-2">
-                                12 <Zap className="w-4 h-4 text-yellow-400" />
+                                {stats.totalSkills} <Zap className="w-4 h-4 text-yellow-400" />
                             </div>
                         </div>
                         <div className="rounded-3xl bg-[#1e1e2d]/40 border border-white/5 p-5 hover:bg-[#1e1e2d]/60 transition-colors">
-                            <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Rating</div>
+                            <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Members</div>
                             <div className="text-2xl font-bold text-white flex items-center gap-2">
-                                4.9 <TrendingUp className="w-4 h-4 text-green-400" />
+                                {stats.totalUsers} <TrendingUp className="w-4 h-4 text-green-400" />
                             </div>
                         </div>
                     </div>

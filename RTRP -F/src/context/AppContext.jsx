@@ -46,7 +46,7 @@ export function AppProvider({ children }) {
             const [skillsRes, userRes, chatsRes] = await Promise.all([
                 fetch(`${API_URL}/skills`).catch(err => ({ ok: false, error: err })),
                 fetch(`${API_URL}/user`, { headers }).catch(err => ({ ok: false, error: err })),
-                fetch(`${API_URL}/chats`).catch(err => ({ ok: false, error: err }))
+                fetch(`${API_URL}/chats`, { headers }).catch(err => ({ ok: false, error: err }))
             ]);
 
             const parseSafe = async (res) => {
@@ -191,13 +191,14 @@ export function AppProvider({ children }) {
             }));
 
             // API Call
+            const token = localStorage.getItem('token');
             const res = await fetch(`${API_URL}/chats/${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // 'Authorization': `Bearer ${localStorage.getItem('token')}` // Backend doesn't use auth yet
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ text: message, sender: 'me' })
+                body: JSON.stringify({ text: message })
             });
 
             if (!res.ok) {

@@ -25,12 +25,6 @@ export default function ChatPanel({ skill, onClose }) {
         }
     };
 
-    const quickMessages = [
-        "I'd like to trade 2 hours of my skills for yours!",
-        "What times work best for you?",
-        "Can you tell me more about your teaching style?",
-    ];
-
     return (
         <div className="fixed right-4 bottom-4 w-96 h-[600px] bg-[#1e1e2d]/95 backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col z-50 shadow-2xl animate-in slide-in-from-right duration-300">
             {/* Header */}
@@ -39,7 +33,7 @@ export default function ChatPanel({ skill, onClose }) {
                     <div className="relative">
                         <img
                             src={skill.user.avatar}
-                            alt={skill.user.name}
+                            alt={skill.user.username}
                             className="w-10 h-10 rounded-full border border-white/10"
                         />
                         {skill.user.online && (
@@ -47,7 +41,7 @@ export default function ChatPanel({ skill, onClose }) {
                         )}
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-white">{skill.user.name}</p>
+                        <p className="text-sm font-bold text-white">{skill.user.username}</p>
                         <p className="text-xs text-purple-300 font-medium">{skill.title}</p>
                     </div>
                 </div>
@@ -73,19 +67,7 @@ export default function ChatPanel({ skill, onClose }) {
                             <Send className="w-8 h-8 text-gray-600" />
                         </div>
                         <p className="text-gray-300 font-medium mb-1">Start the conversation</p>
-                        <p className="text-xs text-gray-500 mb-6 px-4">Negotiate terms, schedule a time, or ask questions.</p>
-
-                        <div className="space-y-2">
-                            {quickMessages.map((msg, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setMessage(msg)}
-                                    className="block w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-transparent hover:border-purple-500/30"
-                                >
-                                    {msg}
-                                </button>
-                            ))}
-                        </div>
+                        <p className="text-xs text-gray-500 px-4">Send a message to begin trading skills.</p>
                     </div>
                 ) : (
                     chatMessages.map((msg) => (
@@ -94,8 +76,8 @@ export default function ChatPanel({ skill, onClose }) {
                             className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
                         >
                             <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl ${msg.sender === 'me'
-                                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-tr-sm'
-                                    : 'bg-white/10 text-gray-200 rounded-tl-sm'
+                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-tr-sm'
+                                : 'bg-white/10 text-gray-200 rounded-tl-sm'
                                 }`}>
                                 <p className="text-sm leading-relaxed">{msg.text}</p>
                                 <div className="flex items-center justify-end gap-1 mt-1 opacity-70">

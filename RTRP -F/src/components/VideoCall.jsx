@@ -119,13 +119,13 @@ export default function VideoCall({ skill, onClose }) {
                             <div className="relative">
                                 <img
                                     src={skill.user.avatar}
-                                    alt={skill.user.name}
+                                    alt={skill.user.username}
                                     className="w-12 h-12 rounded-full border-2 border-white/20"
                                 />
                                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></span>
                             </div>
                             <div>
-                                <h3 className="text-white font-semibold text-lg">{skill.user.name}</h3>
+                                <h3 className="text-white font-semibold text-lg">{skill.user.username}</h3>
                                 <p className="text-gray-300 text-sm">{skill.title}</p>
                             </div>
                         </div>
@@ -143,11 +143,11 @@ export default function VideoCall({ skill, onClose }) {
                                 <div className="absolute inset-0 bg-purple-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
                                 <img
                                     src={skill.user.avatar}
-                                    alt={skill.user.name}
+                                    alt={skill.user.username}
                                     className="w-32 h-32 rounded-full bg-gray-700 relative z-10 border-4 border-gray-800"
                                 />
                             </div>
-                            <h3 className="text-white text-2xl font-bold mt-6">{skill.user.name}</h3>
+                            <h3 className="text-white text-2xl font-bold mt-6">{skill.user.username}</h3>
                             <p className="text-purple-300 mt-2">{!hasStarted ? 'Ready to connect?' : 'Connecting...'}</p>
                         </div>
                     </div>
@@ -255,8 +255,8 @@ function ControlBtn({ icon: Icon, active = false, onClick, activeColor = 'bg-whi
             <button
                 onClick={onClick}
                 className={`p-4 rounded-xl transition-all ${active
-                        ? activeColor
-                        : 'bg-white/10 text-white hover:bg-white/20 border border-white/5'
+                    ? activeColor
+                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/5'
                     }`}
             >
                 <Icon className="w-6 h-6" />

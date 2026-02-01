@@ -24,21 +24,25 @@ app.use('/api/auth', authRoutes);
 
 // Stats endpoint - returns community statistics
 const db = require('./db/database');
-const store = require('./data/store');
 
 app.get('/api/stats', (req, res) => {
-    // Get user count from SQLite
-    db.get('SELECT COUNT(*) as userCount FROM users', [], (err, row) => {
+    // Get user count from MySQL
+    db.get('SELECT COUNT(*) as userCount FROM users', [], (err, userRow) => {
         if (err) {
             return res.status(500).json({ message: 'Database error' });
         }
 
-        const skills = store.getUserSkills();
+        // Get skill count from MySQL
+        db.get('SELECT COUNT(*) as skillCount FROM skills', [], (err, skillRow) => {
+            if (err) {
+                return res.status(500).json({ message: 'Database error' });
+            }
 
-        res.json({
-            totalUsers: row?.userCount || 0,
-            totalSkills: skills.length,
-            onlineUsers: skills.filter(s => s.user?.online).length
+            res.json({
+                totalUsers: userRow?.userCount || 0,
+                totalSkills: skillRow?.skillCount || 0,
+                onlineUsers: 0 // Online status is simulated in frontend
+            });
         });
     });
 });

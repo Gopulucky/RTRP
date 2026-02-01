@@ -66,10 +66,8 @@ export default function Profile() {
         }
     };
 
-    // Filter skills for this user
-    // Note: The backend returns "skills" related to this user in a real app,
-    // but here we filter the global skills list for simplicity as per current store structure.
-    const myTeachSkills = skills.filter(s => s.user?.name === currentUser?.name || s.user?.username === currentUser?.username); // Fallback logic
+    // Filter skills for this user by ID (most reliable comparison)
+    const myTeachSkills = skills.filter(s => s.user?.id === currentUser?.id);
 
     const stats = [
         { label: 'Time Credits', value: currentUser?.timeCredits || 0, icon: Clock, color: 'text-purple-400' },

@@ -51,8 +51,22 @@ router.post('/login', (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
+        // Set user as online
+        db.run('UPDATE users SET is_online = TRUE, last_seen = NOW() WHERE id = ?', [user.id]);
+
         const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '1h' });
-        res.json({ message: 'Login successful', token, user: { id: user.id, username: user.username, email: user.email, avatar: user.avatar, timeCredits: user.timeCredits } });
+        res.json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                avatar: user.avatar,
+                timeCredits: user.timeCredits,
+                is_online: true
+            }
+        });
     });
 });
 

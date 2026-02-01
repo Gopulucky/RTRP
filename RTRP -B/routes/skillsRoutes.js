@@ -4,13 +4,14 @@ const db = require('../db/database');
 
 // GET all skills (returns all user-created skills for browsing)
 router.get('/', (req, res) => {
-    // Join with users table to get creator details
+    // Join with users table to get creator details including online status
     const sql = `
         SELECT skills.*, 
                users.username as user_username, 
                users.email as user_email, 
                users.avatar as user_avatar,
-               users.id as user_actual_id
+               users.id as user_actual_id,
+               users.is_online as user_online
         FROM skills
         JOIN users ON skills.user_id = users.id
     `;
@@ -32,7 +33,8 @@ router.get('/', (req, res) => {
                 id: row.user_actual_id,
                 username: row.user_username,
                 email: row.user_email,
-                avatar: row.user_avatar
+                avatar: row.user_avatar,
+                online: row.user_online === 1 || row.user_online === true
             }
         }));
 
@@ -47,7 +49,8 @@ router.get('/:id', (req, res) => {
                users.username as user_username, 
                users.email as user_email, 
                users.avatar as user_avatar,
-               users.id as user_actual_id
+               users.id as user_actual_id,
+               users.is_online as user_online
         FROM skills
         JOIN users ON skills.user_id = users.id
         WHERE skills.id = ?
@@ -72,7 +75,8 @@ router.get('/:id', (req, res) => {
                 id: row.user_actual_id,
                 username: row.user_username,
                 email: row.user_email,
-                avatar: row.user_avatar
+                avatar: row.user_avatar,
+                online: row.user_online === 1 || row.user_online === true
             }
         };
 
