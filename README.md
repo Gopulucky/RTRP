@@ -1,508 +1,372 @@
-# Project Presentation Script: SkillSwap (RTRP)
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React 19" />
+  <img src="https://img.shields.io/badge/Vite-7.2-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/TailwindCSS-4.1-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/Express-5.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+  <img src="https://img.shields.io/badge/Node.js-LTS-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+</p>
 
-**Project Title:** SkillSwap (Real-Time Resource Pool)
-**Course:** [Insert Course Name]
-**Team Members & Roles:**
-- **[Member 1 Name]:** Frontend Development (React UI)
-- **[Member 2 Name]:** Backend API (Node/Express)
-- **[Member 3 Name]:** Database Design & Integration
-**Guide/Mentor:** [Insert Mentor Name]
+<h1 align="center">🔄 SkillSwap — Trade Skills, Not Money</h1>
 
----
+<p align="center">
+  <strong>A full-stack time-banking platform enabling students to exchange skills using time credits instead of money.</strong>
+  <br />
+  <em>Learn Guitar for React lessons. Trade hours, grow together.</em>
+</p>
 
-## 1. Introduction
-**Slide Title:** Introduction to SkillSwap
-
-**Speaker Notes:**
-Good morning/afternoon everyone. Today, we are presenting our project, **SkillSwap**, which is a Real-Time Resource Pool (RTRP).
-SkillSwap is a web-based platform designed to facilitate peer-to-peer skill exchange without the need for money. It operates on a "Time Banking" concept where time is the currency.
-In a world where specialized education is often expensive, SkillSwap aims to democratize learning by allowing anyone to teach what they know and learn what they don't, simply by trading their time.
-
----
-
-## 2. Problem Statement
-**Slide Title:** Problem Statement & Motivation
-
-**Key Points:**
-- **High Cost of Education:** Professional tutoring and courses are often expensive.
-- **One-Way Learning:** Traditional platforms are often just consumption-based (videos), lacking interactive feedback.
-- **Undervalued Skills:** Many people have valuable skills (cooking, coding, music) but no easy platform to share them for return value.
-- **Lack of Community:** It's hard to find a local or dedicated learning partner for mutual growth.
-
-**Impact:** This affects students, hobbyists, and professionals who want to upskill but are limited by budget or lack of connections.
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-screenshots">Screenshots</a> •
+  <a href="#-system-architecture">Architecture</a> •
+  <a href="#-database-design">Database</a> •
+  <a href="#-tech-stack">Tech Stack</a> •
+  <a href="#-getting-started">Setup</a> •
+  <a href="#-api-reference">API</a> •
+  <a href="#-project-structure">Structure</a>
+</p>
 
 ---
 
-## 3. Objectives & Goals
-**Slide Title:** Project Objectives
+## 📌 Problem Statement
 
-**Key Points:**
-1.  **Create a Time-Based Economy:** Develop a system where 1 hour of teaching = 1 hour of learning credit.
-2.  **Facilitate Peer-to-Peer Connection:** Enable users to find others based on specific skills.
-3.  **Ensure Real-Time Interaction:** Provide chat and video capabilities for seamless communication.
-4.  **User-Friendly Interface:** Build a responsive, modern web application for easy navigation.
+Students often possess diverse skills but lack the financial means to access paid learning. Traditional tutoring platforms rely on monetary transactions, creating barriers for many learners. **SkillSwap** eliminates this barrier by introducing a **time-credit economy** — every hour you teach earns you an hour of learning.
 
----
+## ✨ Features
 
-## 4. Literature Review / Background
-**Slide Title:** Existing Solutions & Gaps
-
-**Comparison:**
-- **Coursera/Udemy:** Great content, but one-way and expensive. No peer interaction.
-- **Freelance Sites (Upwork/Fiverr):** Transactional and money-focused. Not suitable for casual learning trades.
-- **Traditional Time Banks:** Often offline or localized, lacking modern digital tools.
-
-**Our Gap Analysis:**
-Existing solutions either cost money or lack the structured "skill-for-skill" direct exchange mechanism. SkillSwap bridges this by modernizing the time-bank concept with a dedicated web app.
+| Feature | Description |
+|---------|-------------|
+| 🔐 **Secure Authentication** | JWT-based login/signup with bcrypt password hashing |
+| 📊 **Interactive Dashboard** | Real-time community stats, trending skills, and active members |
+| 🔍 **Skill Marketplace** | Browse, search, and filter skills by category |
+| ⏱️ **Time-Credit System** | Earn credits by teaching, spend them to learn — no money involved |
+| 💬 **Real-Time Messaging** | In-app chat with optimistic UI updates for instant feedback |
+| 📹 **Video Call Integration** | Connect face-to-face for skill exchange sessions |
+| 👤 **Profile Management** | Customizable profiles with avatar, bio, role, and location |
+| 🎯 **Onboarding Flow** | Guided onboarding modal for new users |
+| 🟢 **Online Status Tracking** | See who's currently available for skill exchange |
+| 📱 **Responsive Design** | Fully responsive UI with collapsible sidebar navigation |
 
 ---
 
-## 5. Methodology
-**Slide Title:** Development Methodology
+## 📸 Screenshots
 
-**Approach:**
-- **Agile Development:** We developed the project in sprints—first building the backend, then the frontend UI, and finally integrating them.
-- **Iterative Testing:** Each feature (Auth, Chat) was tested individually before integration.
+### Dashboard
+<p align="center">
+  <img src="diagram/DASHBORD.png" alt="Dashboard" width="90%" />
+</p>
 
-**Tools & Technologies:**
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 19 + Vite + Tailwind CSS |
-| Backend | Node.js + Express.js |
-| Database | MySQL (with mysql2 driver) |
-| Authentication | JWT (JSON Web Tokens) + bcrypt |
-| State Management | React Context API |
+### Browse Skills
+<p align="center">
+  <img src="diagram/BROWSESKILLS.png" alt="Browse Skills" width="90%" />
+</p>
 
----
+### Browse Members
+<p align="center">
+  <img src="diagram/BROWSEMEMBERS.png" alt="Browse Members" width="90%" />
+</p>
 
-## 6. System Design & Architecture
+### My Skills
+<p align="center">
+  <img src="diagram/MYSILLS.png" alt="My Skills" width="90%" />
+</p>
 
-### 6.1 Frontend Architecture
-**Slide Title:** Frontend Architecture
+### Messages
+<p align="center">
+  <img src="diagram/MESSAGES.png" alt="Messages" width="90%" />
+</p>
 
-```mermaid
-graph TB
-    subgraph Browser["🌐 Browser"]
-        subgraph ReactApp["React 19 Application"]
-            Router[React Router DOM]
-            Context[AppContext Provider]
-            
-            subgraph Pages["📄 Pages"]
-                Login[Login.jsx]
-                Signup[Signup.jsx]
-                Dashboard[Dashboard.jsx]
-                Browse[BrowseSkills.jsx]
-                MySkills[MySkills.jsx]
-                Profile[Profile.jsx]
-                Messages[Messages.jsx]
-            end
-            
-            subgraph Components["🧩 Components"]
-                Sidebar[Sidebar]
-                SkillCard[SkillCard]
-                ChatPanel[ChatPanel]
-                VideoCall[VideoCall]
-                Toast[Toast]
-            end
-        end
-    end
-    
-    Router --> Pages
-    Context --> Pages
-    Pages --> Components
-    
-    subgraph Styling["🎨 Styling"]
-        Tailwind[Tailwind CSS]
-        Custom[Custom CSS]
-    end
-    
-    subgraph Build["⚡ Build Tool"]
-        Vite[Vite Dev Server]
-    end
-    
-    ReactApp --> Styling
-    Vite --> ReactApp
-```
-
-**Key Points:**
-- **Single Page Application (SPA):** React Router handles client-side navigation
-- **Global State:** AppContext manages user data, skills, and chat state
-- **Component-Based:** Reusable components like SkillCard and ChatPanel
-- **Modern Styling:** Tailwind CSS for responsive, utility-first design
+### Profile
+<p align="center">
+  <img src="diagram/PROFILE.png" alt="Profile" width="90%" />
+</p>
 
 ---
 
-### 6.2 Backend Architecture
-**Slide Title:** Backend Architecture
+## 🏗️ System Architecture
 
-```mermaid
-graph TB
-    subgraph Server["🖥️ Node.js Server"]
-        Express[Express.js App]
-        
-        subgraph Middleware["🔐 Middleware"]
-            CORS[CORS]
-            JSON[JSON Parser]
-            Auth[JWT Auth]
-        end
-        
-        subgraph Routes["📡 API Routes"]
-            AuthRoutes["/api/auth"]
-            UserRoutes["/api/user"]
-            SkillRoutes["/api/skills"]
-            ChatRoutes["/api/chats"]
-        end
-        
-        subgraph Database["💾 Database Layer"]
-            DBModule[database.js]
-            Pool[MySQL Pool]
-        end
-    end
-    
-    Express --> Middleware
-    Middleware --> Routes
-    Routes --> DBModule
-    DBModule --> Pool
-    
-    subgraph External["🌍 External"]
-        Client[Frontend Client]
-        MySQL[(MySQL Server)]
-    end
-    
-    Client -->|HTTP Requests| Express
-    Pool -->|Queries| MySQL
-```
-
-**API Endpoints:**
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/auth/signup` | POST | Register new user |
-| `/api/auth/login` | POST | Login & get JWT token |
-| `/api/user` | GET | Get current user profile |
-| `/api/user/all` | GET | Get all users (public) |
-| `/api/user/logout` | POST | Set user offline |
-| `/api/skills` | GET/POST | Get all skills / Create skill |
-| `/api/skills/:id` | GET/DELETE | Get/Delete specific skill |
-| `/api/chats` | GET | Get all user conversations |
-| `/api/chats/:userId` | GET/POST | Get/Send messages |
+<p align="center">
+  <img src="diagram/systemmap.png" alt="System Architecture" width="90%" />
+</p>
 
 ---
 
-### 6.3 Signup/Login Flow
-**Slide Title:** Authentication Flow (Signup & Login)
+## 🗃️ Database Design
 
-```mermaid
-sequenceDiagram
-    participant U as 👤 User
-    participant F as 🌐 Frontend
-    participant B as 🖥️ Backend
-    participant DB as 💾 MySQL
+### Entity-Relationship Diagram
 
-    rect rgb(200, 230, 200)
-        Note over U,DB: SIGNUP FLOW
-        U->>F: Fill signup form (username, email, password)
-        F->>B: POST /api/auth/signup
-        B->>B: Hash password with bcrypt
-        B->>DB: INSERT INTO users
-        DB-->>B: Success (user ID)
-        B->>B: Generate JWT token
-        B-->>F: Return { token, user }
-        F->>F: Store token in localStorage
-        F-->>U: Redirect to Dashboard
-    end
+<p align="center">
+  <img src="diagram/entity relationship.webp" alt="Entity Relationship Diagram" width="90%" />
+</p>
 
-    rect rgb(200, 200, 230)
-        Note over U,DB: LOGIN FLOW
-        U->>F: Enter email & password
-        F->>B: POST /api/auth/login
-        B->>DB: SELECT * FROM users WHERE email = ?
-        DB-->>B: Return user record
-        B->>B: Compare password with bcrypt
-        B->>DB: UPDATE users SET is_online = TRUE
-        B->>B: Generate JWT token
-        B-->>F: Return { token, user }
-        F->>F: Store token in localStorage
-        F->>F: Update AppContext with user data
-        F-->>U: Redirect to Dashboard
-    end
+### Database Schema
 
-    rect rgb(230, 200, 200)
-        Note over U,DB: LOGOUT FLOW
-        U->>F: Click Logout
-        F->>B: POST /api/user/logout (with JWT)
-        B->>DB: UPDATE users SET is_online = FALSE
-        B-->>F: Success
-        F->>F: Clear localStorage
-        F-->>U: Redirect to Login
-    end
-```
+<p align="center">
+  <img src="diagram/database.png" alt="Database Schema" width="90%" />
+</p>
 
-**Security Features:**
-- ✅ Password hashing with bcrypt (10 salt rounds)
-- ✅ JWT tokens with 1-hour expiration
-- ✅ Protected routes with auth middleware
-- ✅ Real-time online status tracking
+### Database Relationships
 
----
-
-### 6.4 Database Schema
-**Slide Title:** Database Architecture (MySQL)
-
-```mermaid
-erDiagram
-    USERS ||--o{ SKILLS : "creates"
-    USERS ||--o{ MESSAGES : "sends"
-    USERS ||--o{ MESSAGES : "receives"
-    
-    USERS {
-        int id PK "Auto Increment"
-        varchar username UK "Unique Username"
-        varchar email UK "Unique Email"
-        varchar password "Hashed with bcrypt"
-        text avatar "Profile Image URL"
-        int timeCredits "Default: 10"
-        text bio "User Biography"
-        varchar role "Job Title"
-        varchar location "City/Country"
-        varchar website "Personal URL"
-        boolean is_online "Online Status"
-        timestamp last_seen "Last Activity"
-        timestamp created_at "Registration Date"
-    }
-
-    SKILLS {
-        int id PK "Auto Increment"
-        varchar title "Skill Name"
-        text description "Detailed Description"
-        varchar category "Programming/Music/etc"
-        decimal hours "Time Credit Value"
-        int user_id FK "References Users"
-        timestamp created_at "Posted Date"
-    }
-
-    MESSAGES {
-        int id PK "Auto Increment"
-        int sender_id FK "Who Sent"
-        int receiver_id FK "Who Receives"
-        text text "Message Content"
-        timestamp created_at "Sent Time"
-    }
-```
-
-**Database Relationships:**
 | Relationship | Type | Description |
-|--------------|------|-------------|
-| Users → Skills | One-to-Many | One user can create many skills |
-| Users → Messages (sender) | One-to-Many | One user can send many messages |
-| Users → Messages (receiver) | One-to-Many | One user can receive many messages |
+|---|---|---|
+| `users` → `skills` | One-to-Many | A user can offer multiple skills |
+| `users` → `messages` (sender) | One-to-Many | A user can send many messages |
+| `users` → `messages` (receiver) | One-to-Many | A user can receive many messages |
 
-**Constraints:**
-- `ON DELETE CASCADE` for skills (delete user = delete their skills)
-- `ON DELETE CASCADE` for messages (delete user = delete their messages)
-- `UNIQUE` constraints on username and email
+> **Cascade Delete**: Deleting a user automatically removes all their skills and messages.
 
 ---
 
-### 6.5 Full System Flow
-**Slide Title:** Complete System Flow
+## 🔄 Application Flow
 
-```mermaid
-flowchart TB
-    subgraph User["👤 USER JOURNEY"]
-        Start([Start]) --> Login{Has Account?}
-        Login -->|No| Signup[Signup Page]
-        Login -->|Yes| LoginPage[Login Page]
-        Signup --> Auth[Authentication]
-        LoginPage --> Auth
-    end
-    
-    subgraph App["📱 APPLICATION"]
-        Auth --> Dashboard[Dashboard]
-        Dashboard --> Browse[Browse Skills]
-        Dashboard --> MySkills[My Skills]
-        Dashboard --> Profile[Profile]
-        Dashboard --> Messages[Messages]
-        
-        Browse --> ViewSkill[View Skill Details]
-        ViewSkill --> Chat[Open Chat]
-        ViewSkill --> Video[Start Video Call]
-        
-        MySkills --> CreateSkill[Create New Skill]
-        MySkills --> EditSkill[Edit/Delete Skill]
-        
-        Profile --> EditProfile[Edit Profile]
-        
-        Messages --> Conversation[View Conversation]
-        Conversation --> SendMsg[Send Message]
-    end
-    
-    subgraph Backend["🖥️ BACKEND PROCESSING"]
-        Auth -->|POST /api/auth| AuthAPI[Auth Routes]
-        CreateSkill -->|POST /api/skills| SkillAPI[Skill Routes]
-        EditProfile -->|PUT /api/user| UserAPI[User Routes]
-        SendMsg -->|POST /api/chats| ChatAPI[Chat Routes]
-        
-        AuthAPI --> DB[(MySQL)]
-        SkillAPI --> DB
-        UserAPI --> DB
-        ChatAPI --> DB
-    end
-    
-    subgraph Response["📤 RESPONSE"]
-        DB --> JSON[JSON Response]
-        JSON --> Update[Update UI State]
-        Update --> Dashboard
-    end
+<p align="center">
+  <img src="diagram/flowChart.png" alt="Application Flow Chart" width="90%" />
+</p>
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+| Technology | Version | Purpose |
+|---|---|---|
+| **React** | 19.2 | UI Library with Hooks & Context API |
+| **Vite** | 7.2 | Next-gen build tool & dev server |
+| **TailwindCSS** | 4.1 | Utility-first CSS framework |
+| **React Router DOM** | 7.12 | Client-side routing & navigation |
+| **Lucide React** | 0.562 | Modern icon library |
+
+### Backend
+| Technology | Version | Purpose |
+|---|---|---|
+| **Node.js** | LTS | Server-side JavaScript runtime |
+| **Express** | 5.2 | Minimal web framework for REST APIs |
+| **MySQL2** | 3.16 | MySQL client with connection pooling |
+| **jsonwebtoken** | 9.0 | JWT-based authentication |
+| **bcryptjs** | 3.0 | Secure password hashing (salt rounds: 10) |
+| **dotenv** | 17.2 | Environment variable management |
+| **CORS** | 2.8 | Cross-Origin Resource Sharing |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** (v18+) — [Download](https://nodejs.org/)
+- **MySQL** (v8.0+) — [Download](https://dev.mysql.com/downloads/)
+- **Git** — [Download](https://git-scm.com/)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Gopulucky/RTRP.git
+cd RTRP
 ```
 
-**Complete Data Flow:**
-```mermaid
-sequenceDiagram
-    participant User as 👤 User
-    participant Browser as 🌐 React App
-    participant API as 🖥️ Express API
-    participant Auth as 🔐 JWT Middleware
-    participant DB as 💾 MySQL
+### 2. Set Up the Database
 
-    User->>Browser: Opens App
-    Browser->>API: GET /api/user (with JWT)
-    API->>Auth: Verify Token
-    Auth-->>API: User ID
-    API->>DB: SELECT user WHERE id = ?
-    DB-->>API: User Data
-    API-->>Browser: { user, skills, chats }
-    Browser->>Browser: Update Context State
-    Browser-->>User: Render Dashboard
+```sql
+-- Open MySQL Workbench or CLI and run:
+SOURCE RTRP -B/db/mysql_init.sql;
+```
 
-    User->>Browser: Creates New Skill
-    Browser->>API: POST /api/skills (with JWT)
-    API->>Auth: Verify Token
-    Auth-->>API: User ID
-    API->>DB: INSERT INTO skills
-    DB-->>API: New Skill ID
-    API-->>Browser: { skill }
-    Browser->>Browser: Update Skills State
-    Browser-->>User: Show Success Toast
+Or manually create the database:
+```sql
+CREATE DATABASE IF NOT EXISTS rtrp_db;
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file inside `RTRP -B/`:
+
+```env
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=rtrp_db
+JWT_SECRET=your_super_secret_key
+```
+
+### 4. Install & Run the Backend
+
+```bash
+cd "RTRP -B"
+npm install
+npm run dev        # Starts with nodemon for hot-reload
+```
+
+> Backend runs at `http://localhost:5000`
+
+### 5. Install & Run the Frontend
+
+```bash
+cd "RTRP -F"
+npm install
+npm run dev        # Starts Vite dev server
+```
+
+> Frontend runs at `http://localhost:5173`
+
+---
+
+## 📡 API Reference
+
+### Authentication
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `POST` | `/api/auth/signup` | Register a new user | ❌ |
+| `POST` | `/api/auth/login` | Login & get JWT token | ❌ |
+
+### Skills
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/skills` | Fetch all available skills | ❌ |
+| `POST` | `/api/skills` | Create a new skill listing | ✅ |
+| `PUT` | `/api/skills/:id` | Update a skill | ✅ |
+| `DELETE` | `/api/skills/:id` | Delete a skill | ✅ |
+
+### User
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/user` | Get current user profile | ✅ |
+| `PUT` | `/api/user` | Update profile details | ✅ |
+| `POST` | `/api/user/credits/add` | Add time credits | ✅ |
+| `POST` | `/api/user/credits/spend` | Spend time credits | ✅ |
+
+### Chat
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/chats` | Get all conversations | ✅ |
+| `GET` | `/api/chats/:userId` | Get chat with a specific user | ✅ |
+| `POST` | `/api/chats/:userId` | Send a message to a user | ✅ |
+
+### Utility
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/stats` | Community statistics | ❌ |
+| `GET` | `/api/health` | Server health check | ❌ |
+
+> **Auth**: ✅ = Requires `Authorization: Bearer <token>` header
+
+---
+
+## 📁 Project Structure
+
+```
+RTRP/
+├── 📂 RTRP -F/                    # Frontend (React + Vite)
+│   ├── index.html                  # Entry HTML
+│   ├── vite.config.js              # Vite configuration
+│   ├── package.json                # Frontend dependencies
+│   └── 📂 src/
+│       ├── App.jsx                 # Root component with routing
+│       ├── main.jsx                # React entry point
+│       ├── index.css               # Global styles
+│       ├── 📂 context/
+│       │   └── AppContext.jsx      # Global state management
+│       ├── 📂 pages/
+│       │   ├── Dashboard.jsx       # Home dashboard with stats
+│       │   ├── BrowseSkills.jsx    # Skill marketplace
+│       │   ├── MySkills.jsx        # Manage personal skills
+│       │   ├── Messages.jsx        # Chat interface
+│       │   ├── Profile.jsx         # User profile management
+│       │   ├── Login.jsx           # Login page
+│       │   └── Signup.jsx          # Registration page
+│       └── 📂 components/
+│           ├── Sidebar.jsx         # Collapsible navigation
+│           ├── SkillCard.jsx       # Skill display card
+│           ├── ChatPanel.jsx       # Chat messaging panel
+│           ├── VideoCall.jsx       # Video call interface
+│           ├── OnboardingModal.jsx # New user onboarding
+│           ├── Toast.jsx           # Notification toasts
+│           └── LoadingScreen.jsx   # Loading animation
+│
+├── 📂 RTRP -B/                    # Backend (Node.js + Express)
+│   ├── server.js                   # Express server entry point
+│   ├── package.json                # Backend dependencies
+│   ├── .env                        # Environment variables
+│   ├── 📂 db/
+│   │   ├── database.js             # MySQL connection pool & ORM
+│   │   └── mysql_init.sql          # Database initialization script
+│   ├── 📂 middleware/
+│   │   └── auth.js                 # JWT authentication middleware
+│   └── 📂 routes/
+│       ├── authRoutes.js           # Signup & Login endpoints
+│       ├── skillsRoutes.js         # Skills CRUD operations
+│       ├── userRoutes.js           # Profile & credits management
+│       └── chatRoutes.js           # Messaging endpoints
+│
+└── 📂 diagram/                     # Architecture & design diagrams
 ```
 
 ---
 
-## 7. Implementation Details
-**Slide Title:** Key Features & Implementation
+## 🔒 Security Implementation
 
-**1. Authentication System:**
-- Secure user registration and login
-- JWT token-based authentication
-- Password hashing with bcrypt
-- Session persistence with localStorage
-
-**2. Skill Marketplace:**
-- Create skills with Title, Description, Category, Hours
-- Browse all available skills from community
-- Filter skills by category (Programming, Music, Design, etc.)
-- Real-time online status indicator for skill owners
-
-**3. Real-Time Chat System:**
-- Persistent chat messages stored in MySQL
-- Message history per conversation
-- Real-time message sending and receiving
-
-**4. User Profiles:**
-- Customizable avatars (DiceBear integration)
-- Bio, role, location, and website fields
-- View your own skills on profile page
-- Time credits balance display
-
-**5. Dashboard:**
-- View community statistics (members, skills, online)
-- Quick access to browse marketplace
-- Featured skills grid
-- Member discovery section
+| Layer | Implementation |
+|---|---|
+| **Password Storage** | bcrypt.js with 10 salt rounds — passwords are never stored in plaintext |
+| **Authentication** | JWT tokens with 1-hour expiry for session management |
+| **Route Protection** | Custom middleware validates JWT on every protected endpoint |
+| **Input Validation** | Server-side validation on all user inputs |
+| **CORS** | Configured to allow cross-origin requests from the frontend |
+| **Error Handling** | Global error handler prevents stack trace leaks in production |
 
 ---
 
-## 8. Testing & Results
-**Slide Title:** Testing Strategy
+## 💡 Key Design Decisions
 
-**Methods Used:**
-- **API Testing:** Tested individual endpoints using browser dev tools and Postman
-- **Integration Testing:** Verified Frontend correctly displays data from Backend API
-- **Cross-Browser Testing:** Checked UI consistency on Chrome, Edge, and Firefox
-- **Database Testing:** Verified data persistence in MySQL Workbench
+### Time-Credit Economy
+Instead of monetary transactions, SkillSwap uses a **time-based credit system**:
+- New users start with **10 credits**
+- Teaching a skill **earns** credits equal to session hours
+- Learning a skill **costs** credits equal to session hours
+- This creates a **self-sustaining ecosystem** where knowledge is the currency
 
-**Results:**
-- ✅ Successfully implemented user authentication
-- ✅ Skills stored and retrieved from MySQL database
-- ✅ Chat messages persisted across sessions
-- ✅ Real-time online/offline status tracking
-- ✅ Responsive design on all screen sizes
+### Optimistic UI Updates
+Messages are displayed immediately in the UI before the API confirms delivery, providing an **instant and responsive** user experience. Failed messages are rolled back gracefully.
 
-**Implementation Status:**
-| Feature | Status |
-|---------|--------|
-| User Authentication | ✅ Complete |
-| Skill CRUD Operations | ✅ Complete |
-| Browse & Filter Skills | ✅ Complete |
-| Chat Messaging | ✅ Complete |
-| User Profiles | ✅ Complete |
-| Online Status Tracking | ✅ Complete |
-| Video Calls | ⚠️ UI Ready (WebRTC pending) |
-| Rating System | 📋 Planned |
+### Connection Pooling
+The MySQL connection uses a **pool of 10 connections** with queue management, ensuring high performance under concurrent load without connection exhaustion.
 
 ---
 
-## 9. Challenges & Solutions
-**Slide Title:** Key Learnings & Challenges
+## 🗺️ Roadmap
 
-**Personal Learnings:**
-- "Learned how to build a full-stack application with React and Node.js"
-- "Understood JWT authentication flow and secure password handling"
-- "Learned MySQL database design with foreign key relationships"
-- "Implemented real-time features like online status tracking"
-
-**Technical Challenges:**
-
-| Challenge | Solution |
-|-----------|----------|
-| Database Migration | Migrated from SQLite to MySQL using mysql2 driver |
-| State Management | Used React Context API for global state |
-| API Authentication | Implemented JWT middleware for protected routes |
-| Real-time Status | Added is_online column with login/logout tracking |
-| Responsive Design | Used Tailwind CSS Grid and Flexbox |
+- [ ] 🔔 Real-time notifications with WebSocket
+- [ ] ⭐ Skill ratings & review system
+- [ ] 🗓️ Session scheduling calendar
+- [ ] 📊 Analytics dashboard for skill trends
+- [ ] 🌐 Deploy to production (Vercel + Railway)
+- [ ] 📱 Progressive Web App (PWA) support
 
 ---
 
-## 10. Future Scope
-**Slide Title:** Future Enhancements
+## 🤝 Contributing
 
-- **Video Call Integration:** WebRTC-based in-app video conferencing
-- **Rating & Review System:** Allow learners to rate teachers
-- **Skill Matching Algorithm:** AI-powered skill recommendations
-- **Notification System:** Push notifications for messages and requests
-- **Mobile App:** React Native version for iOS/Android
-- **Payment Integration:** Optional paid premium skills
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
-## 11. Conclusion
-**Slide Title:** Conclusion
+## 📄 License
 
-SkillSwap serves as a fully functional proof-of-concept for a demonetized, community-driven education platform. It successfully implements:
-
-- ✅ Full-stack web development (React + Node.js + MySQL)
-- ✅ Secure authentication with JWT
-- ✅ Real-time features (chat, online status)
-- ✅ Modern, responsive UI design
-- ✅ Persistent data storage
-
-The platform demonstrates the viability of peer-to-peer learning through time banking.
-
-**References:**
-- React Documentation (react.dev)
-- Node.js & Express.js Guides (nodejs.org, expressjs.com)
-- MySQL Documentation (dev.mysql.com)
-- JWT.io (jwt.io)
-- "Time Banking" concepts (Wikipedia/Research papers)
+This project is licensed under the **ISC License**.
 
 ---
-**Thank You!**
+
+<p align="center">
+  <strong>Built with ❤️ as part of the RTRP Internship Program</strong>
+  <br />
+  <em>SkillSwap — Where every hour of teaching becomes an hour of learning.</em>
+</p>
