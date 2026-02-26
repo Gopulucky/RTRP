@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Filter, SlidersHorizontal, ArrowUpRight, Sparkles, User, Clock, Star, Users, MapPin, Globe } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import SkillCard from '../components/SkillCard';
@@ -6,7 +7,8 @@ import ChatPanel from '../components/ChatPanel';
 import VideoCall from '../components/VideoCall';
 
 export default function BrowseSkills() {
-    const { skills } = useApp();
+    const { skills, currentUser } = useApp();
+    const navigate = useNavigate();
     const [activeChat, setActiveChat] = useState(null);
     const [activeVideo, setActiveVideo] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -203,8 +205,8 @@ export default function BrowseSkills() {
                         <SkillCard
                             key={skill.id}
                             skill={skill}
-                            onChat={setActiveChat}
-                            onVideo={setActiveVideo}
+                            onChat={(s) => currentUser ? setActiveChat(s) : navigate('/login')}
+                            onVideo={(s) => currentUser ? setActiveVideo(s) : navigate('/login')}
                         />
                     ))
                 ) : (

@@ -82,18 +82,35 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
             {/* User Footer */}
             <div className="p-4 border-t border-white/5 bg-[#0f0c18]/50">
                 <div className={`rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all duration-300 group ${isCollapsed ? 'p-2 flex justify-center' : 'p-3'}`}>
-                    <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center mb-0' : 'mb-3'}`}>
-                        <img src={currentUser.avatar} alt="User" className="shrink-0 w-10 h-10 rounded-full bg-gray-800 object-cover" />
-                        <div className={`flex-1 min-w-0 transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100 block'}`}>
-                            <h4 className="text-sm font-bold text-white truncate">{currentUser.username || currentUser.name}</h4>
-                            <p className="text-xs text-purple-400 font-medium truncate">{currentUser.timeCredits} hrs credits</p>
+                    {currentUser ? (
+                        <>
+                            <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center mb-0' : 'mb-3'}`}>
+                                <img src={currentUser.avatar} alt="User" className="shrink-0 w-10 h-10 rounded-full bg-gray-800 object-cover" />
+                                <div className={`flex-1 min-w-0 transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100 block'}`}>
+                                    <h4 className="text-sm font-bold text-white truncate">{currentUser.username || currentUser.name}</h4>
+                                    <p className="text-xs text-purple-400 font-medium truncate">{currentUser.timeCredits} hrs credits</p>
+                                </div>
+                            </div>
+                            {/* Buttons hide on collapse */}
+                            <div className={`grid grid-cols-2 gap-2 overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100'}`}>
+                                <Link to="/profile" className="flex items-center justify-center gap-2 p-2 rounded-lg bg-black/20 text-gray-400 hover:text-white transition-colors text-xs font-medium"><Settings className="w-3.5 h-3.5" />Settings</Link>
+                                <button onClick={logout} className="flex items-center justify-center gap-2 p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-xs font-medium"><LogOut className="w-3.5 h-3.5" />Logout</button>
+                            </div>
+                        </>
+                    ) : (
+                        <div className={`flex flex-col gap-2`}>
+                            {isCollapsed ? (
+                                <Link to="/login" className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors" title="Login">
+                                    <LogOut className="w-4 h-4 rotate-180" />
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="flex items-center justify-center gap-2 p-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors text-sm font-medium w-full shadow-lg shadow-purple-500/20">Login</Link>
+                                    <Link to="/signup" className="flex items-center justify-center gap-2 p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors text-sm font-medium w-full">Sign Up</Link>
+                                </>
+                            )}
                         </div>
-                    </div>
-                    {/* Buttons hide on collapse */}
-                    <div className={`grid grid-cols-2 gap-2 overflow-hidden transition-all duration-300 ${isCollapsed ? 'h-0 opacity-0' : 'h-auto opacity-100'}`}>
-                        <Link to="/profile" className="flex items-center justify-center gap-2 p-2 rounded-lg bg-black/20 text-gray-400 hover:text-white transition-colors text-xs font-medium"><Settings className="w-3.5 h-3.5" />Settings</Link>
-                        <button onClick={logout} className="flex items-center justify-center gap-2 p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-xs font-medium"><LogOut className="w-3.5 h-3.5" />Logout</button>
-                    </div>
+                    )}
                 </div>
             </div>
         </aside>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, TrendingUp, Clock, Zap, ArrowRight, Sparkles, Filter, ChevronRight, Activity, Users, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import SkillCard from '../components/SkillCard';
 import ChatPanel from '../components/ChatPanel';
@@ -8,6 +8,7 @@ import VideoCall from '../components/VideoCall';
 
 export default function Dashboard() {
     const { skills, onlineUsers, currentUser } = useApp();
+    const navigate = useNavigate();
     const [activeChat, setActiveChat] = useState(null);
     const [activeVideo, setActiveVideo] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -95,7 +96,8 @@ export default function Dashboard() {
                     </h1>
 
                     <p className="text-xl text-gray-400 max-w-lg leading-relaxed mb-8">
-                        Welcome back, {(currentUser.username || currentUser.name || 'User').split(' ')[0]}! Join {stats.totalUsers} members sharing skills on SkillSwap.
+                        {currentUser ? `Welcome back, ${(currentUser.username || currentUser.name || 'User').split(' ')[0]}! ` : 'Welcome to SkillSwap! '}
+                        Join {stats.totalUsers} members sharing skills on SkillSwap.
                     </p>
 
                     <Link to="/browse" className="group w-fit px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:bg-purple-50 transition-all flex items-center gap-3 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
@@ -124,7 +126,7 @@ export default function Dashboard() {
 
                             <div className="mb-2">
                                 <span className="text-7xl font-bold text-white tracking-tighter">
-                                    {currentUser.timeCredits}
+                                    {currentUser ? currentUser.timeCredits : '--'}
                                 </span>
                                 <span className="text-2xl text-gray-500 ml-2">hrs</span>
                             </div>
@@ -250,8 +252,8 @@ export default function Dashboard() {
                             >
                                 <SkillCard
                                     skill={skill}
-                                    onChat={setActiveChat}
-                                    onVideo={setActiveVideo}
+                                    onChat={(s) => currentUser ? setActiveChat(s) : navigate('/login')}
+                                    onVideo={(s) => currentUser ? setActiveVideo(s) : navigate('/login')}
                                 />
                             </div>
                         ))}

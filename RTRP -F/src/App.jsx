@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -15,20 +15,32 @@ import './index.css';
 function MainLayout() {
   const { currentUser } = useApp();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const location = useLocation();
 
-  if (!currentUser) {
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+  // Private route wrapper
+  const PrivateRoute = ({ children }) => {
+    return currentUser ? children : <Navigate to="/login" replace />;
+  };
+
+  if (isAuthPage && !currentUser) {
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
   }
 
+  // Redirect away from login/signup if already logged in
+  if (isAuthPage && currentUser) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <div className="min-h-screen text-gray-100 font-sans selection:bg-purple-500/30">
-      <OnboardingModal />
+      {currentUser && <OnboardingModal />}
 
       {/* Sidebar Component (Fixed Position) */}
       <Sidebar
@@ -49,14 +61,13 @@ function MainLayout() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/browse" element={<BrowseSkills />} />
-            <Route path="/my-skills" element={<MySkills />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/my-skills" element={<PrivateRoute><MySkills /></PrivateRoute>} />
+            <Route path="/messages" element={<PrivateRoute><Messages /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             {/* Redirect unknown routes to Dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
-
       </main>
     </div>
   );
